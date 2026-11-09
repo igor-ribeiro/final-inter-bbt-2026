@@ -1,10 +1,27 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 @layer base {
   html {
     color-scheme: dark;
-    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    background: var(--color-neutral-950);
-    color: var(--color-neutral-100);
+    background: var(--color-bg);
+    color: var(--color-text);
+  }
+  button {
+    cursor: pointer;
+  }
+  :is(button, input, select):focus-visible {
+    outline: 2px solid var(--color-text);
+    outline-offset: -2px;
+  }
+  input::placeholder {
+    color: var(--color-faint);
+  }
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
   }
 }

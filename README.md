@@ -1,27 +1,31 @@
 # Final Inter BBT 2026
 
-Every Basket of the final, marked in the game Videos. Viewers get a Scoring Log: click a Basket to watch it.
+Every Basket of the final, marked in the game Videos. Viewers get a Scoring Log: tap a Basket to watch it.
 
 Terms (Game, Video, Team, Player, Basket, Scoring Log) are defined in [GLOSSARY.md](./GLOSSARY.md).
 
 ## Marking Baskets (admin)
 
 1. `pnpm install`, then `pnpm dev`
-2. Open http://localhost:5173. Localhost always shows the admin view.
+2. Open http://localhost:5173. Localhost always shows the admin; GitHub Pages never does.
 3. Pick a Video and play it to the moment the Basket is made.
-4. Optionally type the Player's number, then click a button like `Home +2`.
+4. Optionally type the Player's number and press Enter, then press `1` `2` `3` (Team A) or `8` `9` `0` (Team B), or click a `+N` button.
 
-Every change saves straight to `src/game.json`. Typing a new number creates that Player; give Players names in the Players section. Rename Teams at the top. To fix a mistake, delete the Basket and mark it again.
+Space plays/pauses, ← → seek 1s, Shift+← → seek 5s. Typing a new number creates that Player; give Players names in the Players section. To fix a mistake, delete the Basket and mark it again.
 
-Preview the public view locally at http://localhost:5173/?viewer.
+Your work saves to the browser's localStorage. "Reset to game.json" (click twice) discards it.
+
+Preview the public view locally at http://localhost:5173/#/viewer.
 
 ## Publishing
 
-Commit `src/game.json` and push to `main`. GitHub Actions builds the site and deploys it to GitHub Pages.
+1. Click "Export game.json" in the admin.
+2. Replace `public/game.json` with the downloaded file.
+3. Commit and push to `main`. GitHub Actions builds the site and deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
 
 ## Adding Videos
 
-Drop `.mp4` files into `public/videos/`. Videos play in filename order (`01 …`, `02 …`), and the score carries over from one to the next. GitHub rejects files over 100 MB.
+Put `.mp4` files in `public/videos/` and list them in `public/game.json` under `videos` (`id`, `order`, `src`). The score carries over from one Video to the next in `order`. GitHub rejects files over 100 MB.
 
 ## Check
 

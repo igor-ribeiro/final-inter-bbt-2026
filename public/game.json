@@ -1,0 +1,75 @@
+{
+  "title": "Final · Inter BBT 2026",
+  "teams": {
+    "A": {
+      "name": "Pivôs do Churrasco"
+    },
+    "B": {
+      "name": "Inimigos da Cesta"
+    }
+  },
+  "players": [],
+  "videos": [
+    {
+      "id": "01",
+      "order": 1,
+      "src": "videos/1T01.mp4",
+      "durationSec": 687
+    },
+    {
+      "id": "02",
+      "order": 2,
+      "src": "videos/1T02.mp4",
+      "durationSec": 945
+    },
+    {
+      "id": "03",
+      "order": 3,
+      "src": "videos/1T03.mp4",
+      "durationSec": 389
+    },
+    {
+      "id": "04",
+      "order": 4,
+      "src": "videos/2T01.mp4",
+      "durationSec": 102
+    },
+    {
+      "id": "05",
+      "order": 5,
+      "src": "videos/2T02.mp4",
+      "durationSec": 66
+    },
+    {
+      "id": "06",
+      "order": 6,
+      "src": "videos/2T03.mp4",
+      "durationSec": 34
+    },
+    {
+      "id": "07",
+      "order": 7,
+      "src": "videos/2T04.mp4",
+      "durationSec": 1067
+    },
+    {
+      "id": "08",
+      "order": 8,
+      "src": "videos/2T05.mp4",
+      "durationSec": 489
+    },
+    {
+      "id": "09",
+      "order": 9,
+      "src": "videos/2T06.mp4",
+      "durationSec": 259
+    },
+    {
+      "id": "10",
+      "order": 10,
+      "src": "videos/2T07.mp4",
+      "durationSec": 704
+    }
+  ],
+  "baskets": []
+}
