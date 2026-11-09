@@ -1,6 +1,6 @@
 // Run: node --experimental-strip-types src/game.check.ts
 import assert from 'node:assert/strict';
-import { ensurePlayer, scoringLog, type Game } from './game.ts';
+import { boxScore, ensurePlayer, scoringLog, type Game } from './game.ts';
 
 const game: Game = {
   title: 't',
@@ -23,6 +23,31 @@ assert.deepEqual(log.map((r) => r.id), ['3', '2', '1']);
 assert.deepEqual(log.map((r) => [r.score.A, r.score.B]), [[1, 0], [3, 0], [3, 3]]);
 assert.deepEqual(log.map((r) => r.newVideo), [true, false, true]);
 assert.deepEqual(scoringLog({ ...game, baskets: [] }), []);
+
+// Box score: columns add up to the final score, timelines follow game order.
+const box: Game = {
+  ...game,
+  baskets: [
+    { id: 'a', videoId: 'v1', timeSec: 1, team: 'A', points: 2, playerNumber: 7 },
+    { id: 'b', videoId: 'v1', timeSec: 2, team: 'A', points: 3 },
+    { id: 'c', videoId: 'v2', timeSec: 0, team: 'A', points: 1, playerNumber: 7 },
+    { id: 'd', videoId: 'v1', timeSec: 3, team: 'A', points: 3, playerNumber: 4 },
+    { id: 'e', videoId: 'v1', timeSec: 4, team: 'B', points: 2, playerNumber: 9 },
+  ],
+};
+const boxLog = scoringLog(box);
+const boxA = boxScore(boxLog, 'A');
+assert.deepEqual(boxA, [
+  { number: 4, points: 3, timeline: [3] }, // 3 pts ties #7, lower number first
+  { number: 7, points: 3, timeline: [2, 1] },
+  { number: null, points: 3, timeline: [3] }, // "No player" last
+]);
+for (const t of ['A', 'B'] as const)
+  assert.equal(
+    boxScore(boxLog, t).reduce((n, r) => n + r.points, 0),
+    boxLog.at(-1)!.score[t],
+  );
+assert.ok(boxScore(boxLog, 'B').every((r) => r.number !== null)); // no "No player" when not needed
 
 const g2 = ensurePlayer(ensurePlayer(game, 'A', 7), 'A', 7);
 assert.equal(g2.players.length, 1);

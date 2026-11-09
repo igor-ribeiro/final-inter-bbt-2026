@@ -5,9 +5,12 @@ export default {
   content: ['./index.html', './src/**/*.{ts,tsx}'],
   theme: {
     extend: {
+      // Viewer switches to the desktop layout here.
+      screens: { desk: '900px' },
       colors: {
         bg: '#0B0D10',
         surface: '#101318',
+        panel: '#0E1014',
         'surface-2': '#13161B',
         video: '#15181D',
         hover: '#1A1F27',

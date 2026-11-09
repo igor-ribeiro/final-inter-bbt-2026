@@ -71,6 +71,13 @@ a{color:#8A9099}a:hover{color:#E6E8EB}
     <span style="font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums">{{sel.score}}</span>
   </div>
 
+  <div role="tablist" aria-label="Game views" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #23272F; flex-shrink: 0">
+    <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+      <button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="height: 44px; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: {{t.fg}}; box-shadow: {{t.line}}">{{t.label}}</button>
+    </sc-for>
+  </div>
+
+  <div style="flex-grow: 1; min-height: 0; flex-direction: column; display: {{logDisplay}}">
   <div style="display: grid; grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr); padding: 8px 12px; font-size: 10px; letter-spacing: 0.14em; color: #8A9099; border-bottom: 1px solid #23272F; flex-shrink: 0">
     <span style="text-align: right; color: {{teamA}}">PIVÔS</span>
     <span style="text-align: center">SCORE</span>
@@ -109,11 +116,36 @@ a{color:#8A9099}a:hover{color:#E6E8EB}
     </sc-for>
     <div style="text-align: center; padding: 20px 16px 0; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">END OF GAME</div>
   </div>
+  </div>
+
+  <div class="log" role="tabpanel" aria-label="Box score" style="flex-grow: 1; min-height: 0; overflow-y: auto; display: {{boxDisplay}}; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding-bottom: 24px">
+    <sc-for list="{{box}}" as="t" hint-placeholder-count="2">
+      <div style="display: flex; flex-direction: column; min-width: 0; border-right: {{t.divider}}">
+        <div style="display: flex; flex-direction: column; gap: 4px; padding: 14px 12px 12px; border-bottom: 1px solid #23272F">
+          <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: {{t.color}}; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{t.name}}</span>
+          <span style="font-size: 24px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{t.color}}">{{t.total}}</span>
+        </div>
+        <div style="display: flex; justify-content: space-between; padding: 8px 12px; font-size: 10px; letter-spacing: 0.12em; color: #8A9099; border-bottom: 1px solid #23272F">
+          <span>PLAYER</span><span>PTS</span>
+        </div>
+        <sc-for list="{{t.players}}" as="p" hint-placeholder-count="5">
+          <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; border-bottom: 1px solid #1A1E25">
+            <div style="display: flex; align-items: baseline; gap: 6px; min-width: 0">
+              <span style="font-size: 12px; font-weight: 800; color: {{p.numColor}}; flex-shrink: 0">{{p.num}}</span>
+              <span style="font-size: 12px; color: {{p.nameColor}}; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{p.name}}</span>
+              <span style="font-size: 15px; font-weight: 800; font-variant-numeric: tabular-nums">{{p.pts}}</span>
+            </div>
+            <span style="font-size: 11px; color: #8A9099; letter-spacing: 0.08em; font-variant-numeric: tabular-nums">{{p.split}}</span>
+          </div>
+        </sc-for>
+      </div>
+    </sc-for>
+  </div>
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"teamAColor":{"editor":"color","default":"#5EA2FF","options":["#5EA2FF","#3DD6C4","#B794FF"],"section":"Teams"},"teamBColor":{"editor":"color","default":"#FF6B5E","options":["#FF6B5E","#FFA94D","#F472B6"],"section":"Teams"},"videoOrientation":{"editor":"enum","options":["landscape","vertical"],"default":"landscape","section":"Player"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
-  constructor(props) { super(props); this.state = { picked: 18 }; }
+  constructor(props) { super(props); this.state = { picked: 18, tab: 'log' }; }
   renderVals() {
     const A = this.props.teamAColor ?? '#5EA2FF';
     const B = this.props.teamBColor ?? '#FF6B5E';
@@ -154,7 +186,29 @@ class Component extends DCLogic {
           startClock: clock(start), len: clock(len), progress: (start / len * 100).toFixed(1) + '%', markPos: (t / len * 100).toFixed(1) + '%' };
       }
     });
-    return { rows, sel, finalA: a, finalB: b, teamA: A, teamB: B, vertical: orient === 'vertical', landscape: orient !== 'vertical' };
+    const tab = this.state.tab;
+    const tabs = [['log', 'SCORING LOG'], ['box', 'BOX SCORE']].map(([id, label]) => ({
+      label, on: tab === id, pick: () => this.setState({ tab: id }),
+      fg: tab === id ? '#E6E8EB' : '#8A9099', line: tab === id ? 'inset 0 -2px 0 #E6E8EB' : 'none' }));
+    const boxFor = (team, name, color, total) => {
+      const by = {};
+      data.filter((d) => d[2] === team).forEach(([v, t, tm, pts, num]) => {
+        const k = num == null ? 'none' : String(num);
+        by[k] = by[k] || { num, pts: 0, seq: [] };
+        by[k].pts += pts; by[k].seq.push(pts);
+      });
+      const rows = Object.values(by).sort((x, y) => (x.num == null) - (y.num == null) || y.pts - x.pts || x.num - y.num);
+      return { name, color, total, divider: team === 'A' ? '1px solid #23272F' : 'none',
+        players: rows.map((r) => ({
+          num: r.num == null ? '' : '#' + r.num,
+          name: r.num == null ? 'No player' : (names[team][r.num] || ''),
+          numColor: '#E6E8EB', nameColor: r.num == null ? '#8A9099' : '#C9CDD3', pts: r.pts,
+          split: r.seq.join(' ')
+        })) };
+    };
+    return { rows, sel, finalA: a, finalB: b, teamA: A, teamB: B, vertical: orient === 'vertical', landscape: orient !== 'vertical',
+      tabs, logDisplay: tab === 'log' ? 'flex' : 'none', boxDisplay: tab === 'box' ? 'grid' : 'none',
+      box: [boxFor('A', 'PIVÔS DO CHURRASCO', A, a), boxFor('B', 'INIMIGOS DA CESTA', B, b)] };
   }
 }
 </script>

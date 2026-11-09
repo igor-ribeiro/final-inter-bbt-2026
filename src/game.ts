@@ -64,6 +64,32 @@ export function scoringLog(game: Game): LogRow[] {
     });
 }
 
+export interface BoxRow {
+  number: number | null; // null = Baskets with no Player
+  points: number;
+  timeline: number[]; // Basket values in game order
+}
+
+/** One Team's box score from Baskets already in game order (e.g. scoringLog). */
+export function boxScore(gameOrder: Basket[], team: TeamId): BoxRow[] {
+  const by = new Map<number | null, BoxRow>();
+  for (const b of gameOrder) {
+    if (b.team !== team) continue;
+    const key = b.playerNumber ?? null;
+    const row = by.get(key) ?? { number: key, points: 0, timeline: [] };
+    row.points += b.points;
+    row.timeline.push(b.points);
+    by.set(key, row);
+  }
+  // Points desc, then number asc; "No player" last.
+  return [...by.values()].sort(
+    (x, y) =>
+      Number(x.number === null) - Number(y.number === null) ||
+      y.points - x.points ||
+      (x.number ?? 0) - (y.number ?? 0),
+  );
+}
+
 /** Adds the Player for this Team + number if it doesn't exist yet. */
 export function ensurePlayer(game: Game, team: TeamId, number: number): Game {
   if (game.players.some((p) => p.team === team && p.number === number)) return game;

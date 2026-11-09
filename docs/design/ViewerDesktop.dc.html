@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Viewer — Desktop</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0D10}
+button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:0;cursor:pointer;text-align:inherit}
+button:focus-visible{outline:2px solid #E6E8EB;outline-offset:-2px}
+.scroll{scrollbar-width:thin;scrollbar-color:#2C313A transparent}
+.row:hover{background:#13171D}
+.ghost:hover{background:#1A1F27}
+a{color:#8A9099}a:hover{color:#E6E8EB}
+</style>
+</helmet>
+<div style="height: 100vh; min-height: 640px; display: flex; flex-direction: column; background: #0B0D10; color: #E6E8EB; font-family: 'JetBrains Mono', ui-monospace, monospace; overflow: hidden">
+
+  <header style="display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 24px; padding: 16px 32px; border-bottom: 1px solid #23272F; flex-shrink: 0">
+    <span style="font-size: 11px; letter-spacing: 0.14em; color: #8A9099">FINAL · INTER BBT 2026</span>
+    <div style="display: flex; align-items: center; gap: 20px">
+      <span style="font-size: 14px; font-weight: 700; color: {{teamA}}; text-align: right">PIVÔS DO CHURRASCO</span>
+      <span style="display: flex; align-items: baseline; gap: 8px; font-size: 32px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">
+        <span style="color: {{teamA}}">{{finalA}}</span>
+        <span style="color: #4A505A; font-size: 22px">–</span>
+        <span style="color: {{teamB}}">{{finalB}}</span>
+      </span>
+      <span style="font-size: 14px; font-weight: 700; color: {{teamB}}">INIMIGOS DA CESTA</span>
+    </div>
+    <span style="font-size: 11px; letter-spacing: 0.14em; color: #8A9099; text-align: right">FINAL SCORE</span>
+  </header>
+
+  <div style="flex-grow: 1; min-height: 0; display: flex">
+
+    <section style="flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; gap: 16px; padding: 24px 32px; overflow-y: auto" class="scroll">
+      <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #000; border-radius: 6px; overflow: hidden; display: flex; justify-content: center; flex-shrink: 0">
+        <sc-if value="{{vertical}}" hint-placeholder-val="{{ false }}">
+          <div style="height: 100%; aspect-ratio: 9 / 16; background: #15181D"></div>
+        </sc-if>
+        <sc-if value="{{landscape}}" hint-placeholder-val="{{ true }}">
+          <div style="width: 100%; height: 100%; background: #15181D"></div>
+        </sc-if>
+        <div style="position: absolute; top: 14px; left: 14px; display: flex; gap: 6px; font-size: 11px; letter-spacing: 0.08em">
+          <span style="background: rgba(0,0,0,0.7); padding: 5px 8px; border-radius: 3px">VIDEO {{sel.video}}/10</span>
+          <span style="background: rgba(0,0,0,0.7); padding: 5px 8px; border-radius: 3px; color: #C9CDD3">−5s</span>
+        </div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; background: rgba(0,0,0,0.55)">
+          <div style="position: relative; height: 4px; background: #3A3F48; border-radius: 2px">
+            <div style="position: absolute; left: 0; top: 0; height: 4px; width: {{sel.progress}}; background: #E6E8EB; border-radius: 2px"></div>
+            <div style="position: absolute; top: -4px; width: 2px; height: 12px; left: {{sel.markPos}}; background: {{sel.color}}"></div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 14px; font-size: 12px; color: #C9CDD3; font-variant-numeric: tabular-nums">
+            <button aria-label="Pause" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center">
+              <svg width="16" height="16" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="4" width="3.5" height="12" fill="#E6E8EB"></rect><rect x="11.5" y="4" width="3.5" height="12" fill="#E6E8EB"></rect></svg>
+            </button>
+            <span>{{sel.startClock}} / {{sel.len}}</span>
+            <span style="margin-left: auto">Fullscreen</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; align-items: center; gap: 16px; padding: 14px 16px; background: #101318; border: 1px solid #23272F; border-radius: 6px; flex-shrink: 0">
+        <button class="ghost" onClick="{{prev}}" aria-label="Previous basket" style="height: 40px; padding: 0 12px; border: 1px solid #2C313A; border-radius: 4px; font-size: 12px; color: #C9CDD3">← Prev</button>
+        <span style="font-size: 11px; letter-spacing: 0.14em; color: #8A9099">NOW</span>
+        <span style="font-size: 16px; font-weight: 800; color: {{sel.color}}">{{sel.label}}</span>
+        <span style="font-size: 15px; color: #C9CDD3; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{sel.who}}</span>
+        <span style="font-size: 18px; font-weight: 800; font-variant-numeric: tabular-nums">{{sel.score}}</span>
+        <span style="font-size: 12px; color: #8A9099">{{sel.pos}}</span>
+        <button class="ghost" onClick="{{next}}" aria-label="Next basket" style="height: 40px; padding: 0 12px; border: 1px solid #2C313A; border-radius: 4px; font-size: 12px; color: #C9CDD3">Next →</button>
+      </div>
+    </section>
+
+    <aside style="flex: 0 0 460px; display: flex; flex-direction: column; min-height: 0; border-left: 1px solid #23272F; background: #0E1014">
+      <div role="tablist" aria-label="Game views" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-bottom: 1px solid #23272F; flex-shrink: 0">
+        <sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+          <button role="tab" aria-selected="{{t.on}}" onClick="{{t.pick}}" style="height: 48px; text-align: center; font-size: 11px; font-weight: 700; letter-spacing: 0.14em; color: {{t.fg}}; box-shadow: {{t.line}}">{{t.label}}</button>
+        </sc-for>
+      </div>
+
+      <div style="flex-grow: 1; min-height: 0; flex-direction: column; display: {{logDisplay}}">
+        <div style="display: grid; grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr); padding: 10px 16px; font-size: 10px; letter-spacing: 0.14em; color: #8A9099; border-bottom: 1px solid #23272F; flex-shrink: 0">
+          <span style="text-align: right; color: {{teamA}}">PIVÔS</span>
+          <span style="text-align: center">SCORE</span>
+          <span style="color: {{teamB}}">INIMIGOS</span>
+        </div>
+        <div class="scroll" style="flex-grow: 1; min-height: 0; overflow-y: auto; padding-bottom: 24px">
+          <sc-for list="{{rows}}" as="r" hint-placeholder-count="14">
+            <sc-if value="{{r.divider}}" hint-placeholder-val="{{ false }}">
+              <div style="display: flex; align-items: center; gap: 10px; padding: 14px 16px 6px; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">
+                <span>VIDEO {{r.video}}</span>
+                <span style="flex-grow: 1; height: 1px; background: #23272F"></span>
+              </div>
+            </sc-if>
+            <sc-if value="{{r.basket}}" hint-placeholder-val="{{ true }}">
+              <button class="row" onClick="{{r.pick}}" aria-label="{{r.aria}}" aria-pressed="{{r.selected}}" style="width: 100%; min-height: 44px; display: grid; grid-template-columns: minmax(0, 1fr) 84px minmax(0, 1fr); align-items: center; padding: 0 16px; box-sizing: border-box; background: {{r.bg}}; box-shadow: {{r.ring}}">
+                <span style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-width: 0">
+                  <sc-if value="{{r.isA}}" hint-placeholder-val="{{ true }}">
+                    <span style="font-size: 13px; color: #C9CDD3; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{r.who}}</span>
+                    <span style="font-size: 12px; font-weight: 800; padding: 3px 6px; border-radius: 3px; color: {{r.badgeFg}}; background: {{r.badgeBg}}">+{{r.pts}}</span>
+                  </sc-if>
+                </span>
+                <span style="display: flex; justify-content: center; gap: 3px; font-size: 14px; font-variant-numeric: tabular-nums">
+                  <span style="color: {{r.aCol}}; font-weight: {{r.aW}}">{{r.a}}</span>
+                  <span style="color: #4A505A">–</span>
+                  <span style="color: {{r.bCol}}; font-weight: {{r.bW}}">{{r.b}}</span>
+                </span>
+                <span style="display: flex; justify-content: flex-start; align-items: center; gap: 8px; min-width: 0">
+                  <sc-if value="{{r.isB}}" hint-placeholder-val="{{ false }}">
+                    <span style="font-size: 12px; font-weight: 800; padding: 3px 6px; border-radius: 3px; color: {{r.badgeFg}}; background: {{r.badgeBg}}">+{{r.pts}}</span>
+                    <span style="font-size: 13px; color: #C9CDD3; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{r.who}}</span>
+                  </sc-if>
+                </span>
+              </button>
+            </sc-if>
+          </sc-for>
+          <div style="text-align: center; padding: 20px 16px 0; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">END OF GAME</div>
+        </div>
+      </div>
+
+      <div class="scroll" role="tabpanel" aria-label="Box score" style="flex-grow: 1; min-height: 0; overflow-y: auto; display: {{boxDisplay}}; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; padding-bottom: 24px">
+        <sc-for list="{{box}}" as="t" hint-placeholder-count="2">
+          <div style="display: flex; flex-direction: column; min-width: 0; border-right: {{t.divider}}">
+            <div style="display: flex; flex-direction: column; gap: 4px; padding: 16px 16px 14px; border-bottom: 1px solid #23272F">
+              <span style="font-size: 10px; font-weight: 700; letter-spacing: 0.12em; color: {{t.color}}; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{t.name}}</span>
+              <span style="font-size: 28px; font-weight: 800; font-variant-numeric: tabular-nums; color: {{t.color}}">{{t.total}}</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding: 8px 16px; font-size: 10px; letter-spacing: 0.12em; color: #8A9099; border-bottom: 1px solid #23272F">
+              <span>PLAYER</span><span>PTS</span>
+            </div>
+            <sc-for list="{{t.players}}" as="p" hint-placeholder-count="5">
+              <div style="display: flex; flex-direction: column; gap: 4px; padding: 10px 16px; border-bottom: 1px solid #1A1E25">
+                <div style="display: flex; align-items: baseline; gap: 6px; min-width: 0">
+                  <span style="font-size: 13px; font-weight: 800; flex-shrink: 0">{{p.num}}</span>
+                  <span style="font-size: 13px; color: {{p.nameColor}}; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{p.name}}</span>
+                  <span style="font-size: 16px; font-weight: 800; font-variant-numeric: tabular-nums">{{p.pts}}</span>
+                </div>
+                <span style="font-size: 11px; color: #8A9099; letter-spacing: 0.08em; font-variant-numeric: tabular-nums">{{p.split}}</span>
+              </div>
+            </sc-for>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"teamAColor":{"editor":"color","default":"#5EA2FF","options":["#5EA2FF","#3DD6C4","#B794FF"],"section":"Teams"},"teamBColor":{"editor":"color","default":"#FF6B5E","options":["#FF6B5E","#FFA94D","#F472B6"],"section":"Teams"},"videoOrientation":{"editor":"enum","options":["landscape","vertical"],"default":"landscape","section":"Player"},"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { picked: 18, tab: 'log' }; }
+  renderVals() {
+    const A = this.props.teamAColor ?? '#5EA2FF';
+    const B = this.props.teamBColor ?? '#FF6B5E';
+    const orient = this.props.videoOrientation ?? 'landscape';
+    const names = { A: { 7: 'João', 11: 'Rafa', 23: 'Dudu', 15: 'Beto' }, B: { 3: 'Marcos', 9: 'Léo', 21: 'Caio' } };
+    const data = [
+      [1,38,'A',2,7],[1,71,'B',2,9],[1,102,'A',3,11],[1,140,'B',2,null],[1,188,'B',3,3],[1,231,'A',2,23],
+      [2,15,'A',1,4],[2,50,'B',2,21],[2,94,'A',2,7],[2,133,'B',2,12],[2,170,'A',3,7],[2,214,'B',1,3],
+      [3,22,'B',3,3],[3,61,'A',2,null],[3,99,'B',2,9],[3,148,'A',1,15],[3,190,'B',3,21],[3,245,'A',2,11],
+      [4,30,'A',3,7],[4,77,'B',2,null],[4,118,'B',2,3],[4,160,'A',1,null]
+    ];
+    const clock = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    const picked = this.state.picked;
+    let a = 0, b = 0, lastVideo = 0;
+    const rows = []; let sel = null;
+    data.forEach(([v, t, team, pts, num], i) => {
+      if (v !== lastVideo) { rows.push({ divider: true, basket: false, video: v }); lastVideo = v; }
+      if (team === 'A') a += pts; else b += pts;
+      const col = team === 'A' ? A : B;
+      const nm = num != null ? names[team][num] : null;
+      const who = num == null ? '' : ('#' + num + (nm ? ' ' + nm : ''));
+      const selected = picked === i;
+      rows.push({
+        divider: false, basket: true, video: v, pts, who, a, b, selected,
+        isA: team === 'A', isB: team === 'B',
+        aria: (team === 'A' ? 'Pivôs' : 'Inimigos') + ' plus ' + pts + (who ? ', ' + who : '') + ', score ' + a + ' to ' + b + '. Play.',
+        bg: selected ? '#161B22' : 'transparent',
+        ring: selected ? 'inset 0 0 0 1px ' + col : 'none',
+        badgeFg: selected ? '#0B0D10' : col,
+        badgeBg: selected ? col : col + '24',
+        aCol: team === 'A' ? A : '#8A9099', bCol: team === 'B' ? B : '#8A9099',
+        aW: team === 'A' ? 800 : 400, bW: team === 'B' ? 800 : 400,
+        pick: () => this.setState({ picked: i })
+      });
+      if (selected) {
+        const start = Math.max(0, t - 5), len = 300;
+        sel = { video: v, color: col, label: (team === 'A' ? 'PIVÔS' : 'INIMIGOS') + ' +' + pts, who: who || 'Unknown player', score: a + '–' + b,
+          pos: (i + 1) + ' of ' + data.length,
+          startClock: clock(start), len: clock(len), progress: (start / len * 100).toFixed(1) + '%', markPos: (t / len * 100).toFixed(1) + '%' };
+      }
+    });
+    const tab = this.state.tab;
+    const tabs = [['log', 'SCORING LOG'], ['box', 'BOX SCORE']].map(([id, label]) => ({
+      label, on: tab === id, pick: () => this.setState({ tab: id }),
+      fg: tab === id ? '#E6E8EB' : '#8A9099', line: tab === id ? 'inset 0 -2px 0 #E6E8EB' : 'none' }));
+    const boxFor = (team, name, color, total) => {
+      const by = {};
+      data.filter((d) => d[2] === team).forEach(([v, t, tm, pts, num]) => {
+        const k = num == null ? 'none' : String(num);
+        by[k] = by[k] || { num, pts: 0, seq: [] };
+        by[k].pts += pts; by[k].seq.push(pts);
+      });
+      const list = Object.values(by).sort((x, y) => (x.num == null) - (y.num == null) || y.pts - x.pts || x.num - y.num);
+      return { name, color, total, divider: team === 'A' ? '1px solid #23272F' : 'none',
+        players: list.map((r) => ({
+          num: r.num == null ? '' : '#' + r.num,
+          name: r.num == null ? 'No player' : (names[team][r.num] || ''),
+          nameColor: r.num == null ? '#8A9099' : '#C9CDD3', pts: r.pts, split: r.seq.join(' ')
+        })) };
+    };
+    return { rows, sel, finalA: a, finalB: b, teamA: A, teamB: B,
+      vertical: orient === 'vertical', landscape: orient !== 'vertical',
+      prev: () => this.setState({ picked: Math.max(0, picked - 1) }),
+      next: () => this.setState({ picked: Math.min(data.length - 1, picked + 1) }),
+      tabs, logDisplay: tab === 'log' ? 'flex' : 'none', boxDisplay: tab === 'box' ? 'grid' : 'none',
+      box: [boxFor('A', 'PIVÔS DO CHURRASCO', A, a), boxFor('B', 'INIMIGOS DA CESTA', B, b)] };
+  }
+}
+</script>
+</body>
+</html>
