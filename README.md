@@ -10,6 +10,7 @@ Terms (Game, Video, Team, Player, Basket, Scoring Log) are defined in [GLOSSARY.
 2. Open http://localhost:5173. Localhost always shows the admin; GitHub Pages never does.
 3. Pick a Video and play it to the moment the Basket is made.
 4. Optionally pick the Player, then press `1` `2` `3` (Team A) or `8` `9` `0` (Team B), or click a `+N` button.
+5. At the end of a quarter or period, press `Q` or `P` (or click the button). These show in the Scoring log with the score at that moment.
 
 Space plays/pauses, ← → seek 1s, Shift+← → seek 5s. Add Players (number, optional name) in the Players section. To fix a mistake, delete the Basket and mark it again.
 

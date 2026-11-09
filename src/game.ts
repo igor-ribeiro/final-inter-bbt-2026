@@ -9,12 +9,21 @@ export interface Basket {
   playerNumber?: number;
 }
 
+/** End of a quarter or period, marked at one moment in a Video like a Basket. */
+export interface PeriodEnd {
+  id: string;
+  videoId: string;
+  timeSec: number;
+  kind: 'quarter' | 'period';
+}
+
 export interface Game {
   title: string;
   teams: Record<TeamId, { name: string }>;
   players: { team: TeamId; number: number; name?: string }[];
   videos: { id: string; order: number; src: string; durationSec?: number }[];
   baskets: Basket[];
+  periodEnds?: PeriodEnd[]; // optional: older game.json files have none
 }
 
 // The one place team colors live (tailwind.config.ts imports these too).
@@ -41,28 +50,49 @@ export function playerLabel(game: Game, b: Basket) {
   return `#${b.playerNumber}${p?.name ? ` ${p.name}` : ''}`;
 }
 
-export interface LogRow extends Basket {
-  score: Record<TeamId, number>; // running score after this Basket
+interface Positioned {
+  score: Record<TeamId, number>; // running score at this point
   videoIndex: number; // 0-based position of its Video in Game order
-  newVideo: boolean; // first Basket of its Video
+  newVideo: boolean; // first entry of its Video
+}
+export type LogRow = Basket & Positioned & { type: 'basket' };
+export type EndRow = PeriodEnd & Positioned & { type: 'end'; label: string }; // "END OF Q2"
+export type LogEntry = LogRow | EndRow;
+
+/**
+ * Every Basket and period end in Game order (video order, then timeSec; a Basket at the
+ * same moment as an end counts before it), with the running score.
+ */
+export function gameLog(game: Game): LogEntry[] {
+  const index = new Map(sortedVideos(game).map((v, i) => [v.id, i]));
+  const idx = (x: { videoId: string }) => index.get(x.videoId) ?? Infinity;
+  const items = [
+    ...game.baskets.map((b) => ({ ...b, type: 'basket' as const })),
+    ...(game.periodEnds ?? []).map((e) => ({ ...e, type: 'end' as const })),
+  ].sort(
+    (a, b) =>
+      idx(a) - idx(b) || a.timeSec - b.timeSec || Number(a.type === 'end') - Number(b.type === 'end'),
+  );
+  const score = { A: 0, B: 0 };
+  const count = { quarter: 0, period: 0 };
+  let lastVideo = -1;
+  return items.map((x): LogEntry => {
+    const videoIndex = idx(x);
+    const pos = { videoIndex, newVideo: videoIndex !== lastVideo };
+    lastVideo = videoIndex;
+    if (x.type === 'basket') {
+      score[x.team] += x.points;
+      return { ...x, ...pos, score: { ...score } };
+    }
+    const n = ++count[x.kind];
+    const label = x.kind === 'quarter' ? `END OF Q${n}` : `END OF PERIOD ${n}`;
+    return { ...x, ...pos, score: { ...score }, label };
+  });
 }
 
-/** Every Basket in Game order (video order, then timeSec) with the running score. */
-export function scoringLog(game: Game): LogRow[] {
-  const index = new Map(sortedVideos(game).map((v, i) => [v.id, i]));
-  const idx = (b: Basket) => index.get(b.videoId) ?? Infinity;
-  const score = { A: 0, B: 0 };
-  let lastVideo = -1;
-  return [...game.baskets]
-    .sort((a, b) => idx(a) - idx(b) || a.timeSec - b.timeSec)
-    .map((b) => {
-      score[b.team] += b.points;
-      const videoIndex = idx(b);
-      const newVideo = videoIndex !== lastVideo;
-      lastVideo = videoIndex;
-      return { ...b, score: { ...score }, videoIndex, newVideo };
-    });
-}
+/** Just the Baskets of gameLog. */
+export const scoringLog = (game: Game): LogRow[] =>
+  gameLog(game).filter((e): e is LogRow => e.type === 'basket');
 
 export interface BoxRow {
   number: number | null; // null = Baskets with no Player

@@ -1,6 +1,6 @@
 // Run: node --experimental-strip-types src/game.check.ts
 import assert from 'node:assert/strict';
-import { boxScore, ensurePlayer, scoringLog, type Game } from './game.ts';
+import { boxScore, ensurePlayer, gameLog, scoringLog, type Game } from './game.ts';
 
 const game: Game = {
   title: 't',
@@ -48,6 +48,22 @@ for (const t of ['A', 'B'] as const)
     boxLog.at(-1)!.score[t],
   );
 assert.ok(boxScore(boxLog, 'B').every((r) => r.number !== null)); // no "No player" when not needed
+
+// Period ends: interleaved in game order, numbered per kind, carry the running score.
+const withEnds = gameLog({
+  ...game,
+  periodEnds: [
+    { id: 'p1', videoId: 'v2', timeSec: 5, kind: 'period' },
+    { id: 'q1', videoId: 'v1', timeSec: 9, kind: 'quarter' }, // same moment as Basket '2': after it
+    { id: 'q2', videoId: 'v2', timeSec: 5, kind: 'quarter' },
+  ],
+});
+assert.deepEqual(
+  withEnds.map((e) => (e.type === 'end' ? `${e.label} ${e.score.A}-${e.score.B}` : e.id)),
+  ['3', '2', 'END OF Q1 3-0', '1', 'END OF PERIOD 1 3-3', 'END OF Q2 3-3'],
+);
+assert.deepEqual(withEnds.map((e) => e.newVideo), [true, false, false, true, false, false]);
+assert.deepEqual(scoringLog(game).map((r) => r.id), ['3', '2', '1']); // still Baskets only
 
 const g2 = ensurePlayer(ensurePlayer(game, 'A', 7), 'A', 7);
 assert.equal(g2.players.length, 1);

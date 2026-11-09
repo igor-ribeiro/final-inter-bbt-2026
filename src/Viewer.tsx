@@ -3,12 +3,14 @@ import {
   LEAD_IN_SEC,
   boxScore,
   fetchGame,
+  gameLog,
   TEAM_COLORS,
   playerLabel,
   scoringLog,
   shortName,
   sortedVideos,
   type BoxRow,
+  type EndRow,
   type Game,
   type LogRow,
   type TeamId,
@@ -39,7 +41,8 @@ export default function Viewer() {
 
 function ViewerScreen({ game }: { game: Game }) {
   const videos = sortedVideos(game);
-  const log = scoringLog(game);
+  const entries = gameLog(game); // Baskets + period ends, for the Scoring log
+  const log = scoringLog(game); // Baskets only: selection, Prev/Next, box score
   const final = log.at(-1)?.score;
   const [selected, setSelected] = useState<LogRow | null>(null);
   const [tab, setTab] = useState<Tab>(loadTab);
@@ -239,16 +242,20 @@ function ViewerScreen({ game }: { game: Game }) {
               <EmptyMessage />
             ) : (
               <div className={`min-h-0 grow overflow-y-auto pb-6 ${SCROLL}`}>
-                {log.map((row) => (
-                  <LogRowView
-                    key={row.id}
-                    row={row}
-                    who={playerLabel(game, row)}
-                    teamName={shortName(name(row.team))}
-                    selected={selected?.id === row.id}
-                    onPlay={() => play(row)}
-                  />
-                ))}
+                {entries.map((e) =>
+                  e.type === 'end' ? (
+                    <EndRowView key={e.id} row={e} />
+                  ) : (
+                    <LogRowView
+                      key={e.id}
+                      row={e}
+                      who={playerLabel(game, e)}
+                      teamName={shortName(name(e.team))}
+                      selected={selected?.id === e.id}
+                      onPlay={() => play(e)}
+                    />
+                  ),
+                )}
                 <div className={`px-4 pt-5 text-center ${LABEL} desk:text-[10px]`}>END OF GAME</div>
               </div>
             )}
@@ -362,6 +369,35 @@ function BoxColumn(props: { game: Game; team: TeamId; rows: BoxRow[]; total: num
   );
 }
 
+function VideoDivider({ index }: { index: number }) {
+  return (
+    <div className={`flex items-center gap-2.5 px-4 pt-3.5 pb-1.5 ${LABEL} desk:text-[10px]`}>
+      <span>VIDEO {index + 1}</span>
+      <span className="h-px grow bg-line" />
+    </div>
+  );
+}
+
+/** "END OF Q2" with the score at that moment, centered on the score column. Not interactive. */
+function EndRowView({ row }: { row: EndRow }) {
+  return (
+    <>
+      {row.newVideo && <VideoDivider index={row.videoIndex} />}
+      <div className={`${COLS} min-h-9 items-center border-y border-line bg-surface px-3 desk:px-4`}>
+        <span className="pr-2 text-right text-[11px] font-bold tracking-[0.14em] text-text-2 desk:text-[10px]">
+          {row.label}
+        </span>
+        <span className="text-center text-[15px] font-extrabold tabular-nums desk:text-sm">
+          {row.score.A}
+          <span className="px-[3px] font-normal text-dash">–</span>
+          {row.score.B}
+        </span>
+        <span />
+      </div>
+    </>
+  );
+}
+
 function LogRowView(props: {
   row: LogRow;
   who: string;
@@ -391,12 +427,7 @@ function LogRowView(props: {
 
   return (
     <>
-      {row.newVideo && (
-        <div className={`flex items-center gap-2.5 px-4 pt-3.5 pb-1.5 ${LABEL} desk:text-[10px]`}>
-          <span>VIDEO {row.videoIndex + 1}</span>
-          <span className="h-px grow bg-line" />
-        </div>
-      )}
+      {row.newVideo && <VideoDivider index={row.videoIndex} />}
       <button
         id={`row-${row.id}`}
         onClick={props.onPlay}

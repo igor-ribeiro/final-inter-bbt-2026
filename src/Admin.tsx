@@ -4,10 +4,12 @@ import {
   clock,
   ensurePlayer,
   fetchGame,
+  gameLog,
   scoringLog,
   sortedVideos,
   type Basket,
   type Game,
+  type PeriodEnd,
   type TeamId,
 } from './game';
 
@@ -61,7 +63,7 @@ export default function Admin() {
 
   useEffect(() => {
     load();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // ponytail: no debounce, localStorage writes are sync and tiny; marks must never be lost.
   function save(next: Game) {
@@ -142,6 +144,8 @@ function AdminScreen(props: {
     const actions: Record<string, () => void> = {
       ' ': togglePlay,
       f: toggleFull,
+      q: () => markEnd('quarter'),
+      p: () => markEnd('period'),
       ArrowLeft: () => seekTo(ref.current!.currentTime - step),
       ArrowRight: () => seekTo(ref.current!.currentTime + step),
     };
@@ -163,6 +167,8 @@ function AdminScreen(props: {
     .filter((b) => b.videoId === video.id)
     .sort((a, b) => a.timeSec - b.timeSec);
   const log = scoringLog(game);
+  // This video's Baskets and period ends, in time order, with labels ("END OF Q2") and scores.
+  const listEntries = gameLog(game).filter((e) => e.videoIndex === videoIndex);
   const entering = log.filter((r) => r.videoIndex < videoIndex).at(-1)?.score;
   // Score at the playhead: everything before this video plus this video's Baskets up to now.
   const current = log
@@ -206,8 +212,23 @@ function AdminScreen(props: {
     setPlayer('');
   }
 
+  function markEnd(kind: PeriodEnd['kind']) {
+    const end: PeriodEnd = {
+      id: crypto.randomUUID(),
+      videoId: video.id,
+      timeSec: Math.round(ref.current!.currentTime * 100) / 100,
+      kind,
+    };
+    setGame({ ...game, periodEnds: [...(game.periodEnds ?? []), end] });
+    setLastId(end.id);
+  }
+
   function remove(id: string) {
-    setGame({ ...game, baskets: game.baskets.filter((b) => b.id !== id) });
+    setGame({
+      ...game,
+      baskets: game.baskets.filter((b) => b.id !== id),
+      periodEnds: (game.periodEnds ?? []).filter((e) => e.id !== id),
+    });
   }
 
   return (
@@ -329,7 +350,7 @@ function AdminScreen(props: {
 
             {/* In full screen, cap the height so the mark buttons stay on screen (video pillarboxes). */}
             <div
-              className={`relative aspect-video w-full overflow-hidden rounded-md border border-line bg-video ${full ? 'max-h-[calc(100dvh-330px)]' : ''}`}
+              className={`relative aspect-video w-full overflow-hidden rounded-md border border-line bg-video ${full ? 'max-h-[calc(100dvh-384px)]' : ''}`}
             >
               <video
                 ref={ref}
@@ -359,11 +380,14 @@ function AdminScreen(props: {
                 >
                   <div className="absolute top-0 left-0 h-1 rounded-sm bg-text" style={{ width: `${len ? (time / len) * 100 : 0}%` }} />
                   {len > 0 &&
-                    inVideo.map((b) => (
+                    listEntries.map((e) => (
                       <div
-                        key={b.id}
-                        className="absolute -top-1 h-3 w-0.5"
-                        style={{ left: `${(b.timeSec / len) * 100}%`, background: TEAM_COLORS[b.team] }}
+                        key={e.id}
+                        className={`absolute w-0.5 ${e.type === 'end' ? '-top-2 h-5 bg-text' : '-top-1 h-3'}`}
+                        style={{
+                          left: `${(e.timeSec / len) * 100}%`,
+                          background: e.type === 'basket' ? TEAM_COLORS[e.team] : undefined,
+                        }}
                       />
                     ))}
                 </div>
@@ -463,9 +487,27 @@ function AdminScreen(props: {
                 </div>
               ))}
             </div>
+            <div className="flex flex-wrap items-center gap-2">
+              {(
+                [
+                  ['quarter', 'End of quarter', 'Q'],
+                  ['period', 'End of period', 'P'],
+                ] as const
+              ).map(([kind, label, key]) => (
+                <button
+                  key={kind}
+                  onClick={() => markEnd(kind)}
+                  aria-label={`${label} (key ${key})`}
+                  className={`${GHOST} flex items-center gap-2 px-3 text-text-2`}
+                >
+                  {label}
+                  <span className="rounded-[3px] border border-line-strong px-[5px] py-px text-[11px] text-muted">{key}</span>
+                </button>
+              ))}
+            </div>
             <p className="text-xs text-muted">
               Marks at the current time. Pick a Player (optional; clears after each mark), then
-              click or press 1/2/3 · 8/9/0. Add Players below. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
+              click or press 1/2/3 · 8/9/0. Q / P end a quarter / period. Add Players below. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
             </p>
           </section>
 
@@ -481,11 +523,40 @@ function AdminScreen(props: {
               <span>PLAYER</span>
               <span />
             </div>
-            {inVideo.length === 0 && (
+            {listEntries.length === 0 && (
               <div className="px-4 py-10 text-center text-muted">No baskets in this video yet.</div>
             )}
             <div className="max-h-[640px] overflow-y-auto">
-              {inVideo.map((b) => (
+              {listEntries.map((b) =>
+                b.type === 'end' ? (
+                  <div
+                    key={b.id}
+                    className={`grid min-h-11 grid-cols-[64px_minmax(0,1fr)_44px] items-center gap-2 border-b border-line-faint px-4 ${b.id === lastId ? 'bg-just-added' : 'bg-bg'}`}
+                  >
+                    <button
+                      onClick={() => seekTo(b.timeSec)}
+                      aria-label={`Jump to ${clock(b.timeSec)}`}
+                      className="h-11 text-left tabular-nums hover:underline"
+                    >
+                      {clock(b.timeSec)}
+                    </button>
+                    <span className="flex items-baseline gap-3">
+                      <span className="text-xs font-bold tracking-[0.14em] text-text-2">{b.label}</span>
+                      <span className="font-extrabold tabular-nums">
+                        {b.score.A}–{b.score.B}
+                      </span>
+                    </span>
+                    <button
+                      onClick={() => remove(b.id)}
+                      aria-label={`Delete ${b.label.toLowerCase()} at ${clock(b.timeSec)}`}
+                      className="flex size-9 items-center justify-center rounded text-muted hover:bg-hover hover:text-team-b"
+                    >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+                        <path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5" />
+                      </svg>
+                    </button>
+                  </div>
+                ) : (
                 <div
                   key={b.id}
                   className={`grid min-h-11 grid-cols-[64px_minmax(0,1fr)_44px_64px_44px] items-center gap-2 border-b border-line-faint px-4 ${b.id === lastId ? 'bg-just-added' : ''}`}
@@ -515,7 +586,8 @@ function AdminScreen(props: {
                     </svg>
                   </button>
                 </div>
-              ))}
+                ),
+              )}
             </div>
           </aside>
         </div>
