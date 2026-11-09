@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Admin — Mark baskets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0D10}
+button,input,select{font:inherit;color:inherit}
+button{background:none;border:0;margin:0;padding:0;cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #E6E8EB;outline-offset:2px}
+input::placeholder{color:#6B717B}
+.ghost:hover{background:#1A1F27}
+.mark:hover{filter:brightness(1.15)}
+.mark:active{transform:translateY(1px)}
+.del:hover{color:#FF6B5E;background:#1A1F27}
+.time:hover{text-decoration:underline}
+a{color:#8A9099}a:hover{color:#E6E8EB}
+</style>
+</helmet>
+<div style="min-height: 100vh; background: #0B0D10; color: #E6E8EB; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">
+<div style="max-width: 1376px; margin: 0 auto; padding: 24px 32px 48px; display: flex; flex-direction: column; gap: 24px; box-sizing: border-box">
+
+  <header style="display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px; padding-bottom: 20px; border-bottom: 1px solid #23272F">
+    <div style="display: flex; flex-direction: column; gap: 6px">
+      <span style="font-size: 11px; letter-spacing: 0.14em; color: #8A9099">ADMIN</span>
+      <h1 style="margin: 0; font-size: 20px; font-weight: 800; letter-spacing: -0.01em">Final Inter BBT 2026</h1>
+    </div>
+    <div style="display: flex; flex-wrap: wrap; align-items: flex-end; gap: 16px">
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; letter-spacing: 0.12em; color: #8A9099">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #5EA2FF"></span>TEAM A</span>
+        <input type="text" value="{{teamA}}" onChange="{{setTeamA}}" style="width: 260px; height: 40px; box-sizing: border-box; padding: 0 12px; background: #13161B; border: 1px solid #2C313A; border-radius: 4px; font-size: 14px; letter-spacing: 0; color: #E6E8EB">
+      </label>
+      <label style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; letter-spacing: 0.12em; color: #8A9099">
+        <span style="display: flex; align-items: center; gap: 6px"><span style="width: 8px; height: 8px; border-radius: 2px; background: #FF6B5E"></span>TEAM B</span>
+        <input type="text" value="{{teamB}}" onChange="{{setTeamB}}" style="width: 260px; height: 40px; box-sizing: border-box; padding: 0 12px; background: #13161B; border: 1px solid #2C313A; border-radius: 4px; font-size: 14px; letter-spacing: 0; color: #E6E8EB">
+      </label>
+      <span style="display: flex; align-items: center; gap: 6px; height: 40px; font-size: 11px; color: #8A9099">
+        <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="#3DD68C" stroke-width="2" aria-hidden="true"><path d="M2 6.5l2.5 2.5L10 3.5"></path></svg>Saved
+      </span>
+    </div>
+  </header>
+
+  <div style="display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start">
+
+    <section style="flex: 999 1 640px; min-width: 0; display: flex; flex-direction: column; gap: 14px">
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 12px">
+        <label for="video" style="font-size: 11px; letter-spacing: 0.12em; color: #8A9099">VIDEO</label>
+        <select id="video" value="{{videoId}}" onChange="{{pickVideo}}" style="height: 40px; min-width: 280px; padding: 0 12px; background: #13161B; border: 1px solid #2C313A; border-radius: 4px; font-size: 14px">
+          <sc-for list="{{videos}}" as="v" hint-placeholder-count="10">
+            <option value="{{v.id}}">{{v.label}}</option>
+          </sc-for>
+        </select>
+        <button class="ghost" onClick="{{prevVideo}}" style="height: 40px; padding: 0 12px; border: 1px solid #2C313A; border-radius: 4px; color: #C9CDD3">← Prev</button>
+        <button class="ghost" onClick="{{nextVideo}}" style="height: 40px; padding: 0 12px; border: 1px solid #2C313A; border-radius: 4px; color: #C9CDD3">Next →</button>
+        <span style="margin-left: auto; font-size: 12px; color: #8A9099">Score entering this video: <span style="color: #E6E8EB; font-weight: 700">{{entering}}</span></span>
+      </div>
+
+      <div style="position: relative; width: 100%; aspect-ratio: 16 / 9; background: #15181D; border-radius: 6px; overflow: hidden; border: 1px solid #23272F">
+        <div style="position: absolute; top: 12px; left: 12px; font-size: 11px; letter-spacing: 0.1em; background: rgba(0,0,0,0.7); padding: 5px 8px; border-radius: 3px">VIDEO {{videoId}}/10 · {{fileName}}</div>
+        <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 12px 14px; background: rgba(0,0,0,0.6); display: flex; flex-direction: column; gap: 8px">
+          <div style="position: relative; height: 4px; background: #3A3F48; border-radius: 2px">
+            <div style="position: absolute; left: 0; top: 0; height: 4px; width: {{progress}}; background: #E6E8EB; border-radius: 2px"></div>
+            <sc-for list="{{ticks}}" as="k" hint-placeholder-count="4">
+              <div style="position: absolute; top: -4px; width: 2px; height: 12px; left: {{k.pos}}; background: {{k.color}}"></div>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+        <span style="font-size: 26px; font-weight: 800; font-variant-numeric: tabular-nums; min-width: 120px">{{clock}}</span>
+        <span style="color: #8A9099; margin-right: 12px">/ 5:00</span>
+        <button class="ghost" onClick="{{back5}}" style="height: 40px; min-width: 52px; border: 1px solid #2C313A; border-radius: 4px">−5s</button>
+        <button class="ghost" onClick="{{back1}}" style="height: 40px; min-width: 52px; border: 1px solid #2C313A; border-radius: 4px">−1s</button>
+        <button aria-label="Play" style="height: 40px; width: 52px; border-radius: 4px; background: #E6E8EB; display: flex; align-items: center; justify-content: center">
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><path d="M3 1.5v11l9-5.5z" fill="#0B0D10"></path></svg>
+        </button>
+        <button class="ghost" onClick="{{fwd1}}" style="height: 40px; min-width: 52px; border: 1px solid #2C313A; border-radius: 4px">+1s</button>
+        <button class="ghost" onClick="{{fwd5}}" style="height: 40px; min-width: 52px; border: 1px solid #2C313A; border-radius: 4px">+5s</button>
+        <span style="margin-left: auto; display: flex; gap: 4px">
+          <button style="height: 40px; padding: 0 10px; border-radius: 4px; color: #8A9099">0.5×</button>
+          <button style="height: 40px; padding: 0 10px; border-radius: 4px; background: #1A1F27; color: #E6E8EB">1×</button>
+          <button style="height: 40px; padding: 0 10px; border-radius: 4px; color: #8A9099">2×</button>
+        </span>
+      </div>
+
+      <div style="display: flex; flex-wrap: wrap; gap: 16px; align-items: stretch; padding: 16px; background: #101318; border: 1px solid #23272F; border-radius: 6px">
+        <label style="display: flex; flex-direction: column; gap: 6px; font-size: 11px; letter-spacing: 0.12em; color: #8A9099">
+          PLAYER #
+          <input type="text" inputmode="numeric" maxlength="2" placeholder="—" value="{{playerNum}}" onChange="{{setNum}}" style="width: 88px; height: 72px; box-sizing: border-box; text-align: center; background: #0B0D10; border: 1px solid #2C313A; border-radius: 4px; font-size: 30px; font-weight: 800; letter-spacing: 0; color: #E6E8EB">
+        </label>
+        <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 11px; letter-spacing: 0.12em; color: #5EA2FF; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{teamAUpper}}</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{btnA}}" as="m" hint-placeholder-count="3">
+              <button class="mark" onClick="{{m.add}}" aria-label="{{m.aria}}" style="height: 72px; border-radius: 4px; background: rgba(94,162,255,0.14); border: 1px solid #5EA2FF; color: #5EA2FF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
+                <span style="font-size: 22px; font-weight: 800">+{{m.pts}}</span>
+                <span style="font-size: 10px; color: #8A9099; border: 1px solid #2C313A; border-radius: 3px; padding: 1px 5px">{{m.key}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+        <div style="flex: 1 1 260px; display: flex; flex-direction: column; gap: 6px">
+          <span style="font-size: 11px; letter-spacing: 0.12em; color: #FF6B5E; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{teamBUpper}}</span>
+          <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+            <sc-for list="{{btnB}}" as="m" hint-placeholder-count="3">
+              <button class="mark" onClick="{{m.add}}" aria-label="{{m.aria}}" style="height: 72px; border-radius: 4px; background: rgba(255,107,94,0.14); border: 1px solid #FF6B5E; color: #FF6B5E; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px">
+                <span style="font-size: 22px; font-weight: 800">+{{m.pts}}</span>
+                <span style="font-size: 10px; color: #8A9099; border: 1px solid #2C313A; border-radius: 3px; padding: 1px 5px">{{m.key}}</span>
+              </button>
+            </sc-for>
+          </div>
+        </div>
+      </div>
+      <p style="margin: 0; font-size: 11px; color: #8A9099">Marks at the current time. Player # clears after each mark. Space play/pause · ← → 1s · Shift+← → 5s</p>
+    </section>
+
+    <aside style="flex: 1 1 380px; min-width: 0; display: flex; flex-direction: column; border: 1px solid #23272F; border-radius: 6px; background: #101318">
+      <div style="display: flex; align-items: baseline; justify-content: space-between; padding: 14px 16px; border-bottom: 1px solid #23272F">
+        <span style="font-size: 11px; letter-spacing: 0.14em; color: #8A9099">BASKETS IN VIDEO {{videoId}}</span>
+        <span style="font-size: 12px; color: #C9CDD3">{{count}}</span>
+      </div>
+      <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px 64px 44px; padding: 8px 16px; gap: 8px; font-size: 10px; letter-spacing: 0.12em; color: #8A9099; border-bottom: 1px solid #23272F">
+        <span>TIME</span><span>TEAM</span><span>PTS</span><span>PLAYER</span><span></span>
+      </div>
+      <sc-if value="{{empty}}" hint-placeholder-val="{{ false }}">
+        <div style="padding: 40px 16px; text-align: center; color: #8A9099">No baskets in this video yet.</div>
+      </sc-if>
+      <div style="max-height: 640px; overflow-y: auto">
+        <sc-for list="{{list}}" as="r" hint-placeholder-count="6">
+          <div style="display: grid; grid-template-columns: 64px minmax(0, 1fr) 44px 64px 44px; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-bottom: 1px solid #1A1E25; background: {{r.bg}}">
+            <button class="time" onClick="{{r.seek}}" aria-label="{{r.seekAria}}" style="height: 44px; text-align: left; font-variant-numeric: tabular-nums; color: #E6E8EB">{{r.clock}}</button>
+            <span style="display: flex; align-items: center; gap: 8px; min-width: 0">
+              <span style="width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; background: {{r.color}}"></span>
+              <span style="overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: {{r.color}}">{{r.team}}</span>
+            </span>
+            <span style="font-weight: 800">+{{r.pts}}</span>
+            <span style="color: {{r.numColor}}">{{r.num}}</span>
+            <button class="del" onClick="{{r.del}}" aria-label="{{r.delAria}}" style="width: 36px; height: 36px; border-radius: 4px; color: #8A9099; display: flex; align-items: center; justify-content: center">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M3 4.5h10M6.5 4.5V3h3v1.5M4.5 4.5l.6 8.5h5.8l.6-8.5"></path></svg>
+            </button>
+          </div>
+        </sc-for>
+      </div>
+    </aside>
+  </div>
+
+  <section style="display: flex; flex-direction: column; gap: 14px; padding-top: 8px">
+    <div style="display: flex; align-items: baseline; gap: 12px">
+      <h2 style="margin: 0; font-size: 11px; letter-spacing: 0.14em; color: #8A9099; font-weight: 500">PLAYERS</h2>
+      <span style="font-size: 11px; color: #8A9099">Added automatically when a number is marked. Names are optional.</span>
+    </div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px">
+      <sc-for list="{{rosters}}" as="t" hint-placeholder-count="2">
+        <div style="display: flex; flex-direction: column; border: 1px solid #23272F; border-radius: 6px; background: #101318">
+          <div style="display: flex; align-items: center; gap: 8px; padding: 12px 16px; border-bottom: 1px solid #23272F">
+            <span style="width: 8px; height: 8px; border-radius: 2px; background: {{t.color}}"></span>
+            <span style="font-weight: 700; color: {{t.color}}">{{t.name}}</span>
+            <span style="margin-left: auto; font-size: 11px; color: #8A9099">{{t.count}}</span>
+          </div>
+          <sc-for list="{{t.players}}" as="p" hint-placeholder-count="5">
+            <label style="display: grid; grid-template-columns: 56px minmax(0, 1fr); align-items: center; gap: 8px; padding: 6px 16px; border-bottom: 1px solid #1A1E25">
+              <span style="font-weight: 800; font-variant-numeric: tabular-nums">#{{p.num}}</span>
+              <input type="text" placeholder="Name (optional)" value="{{p.name}}" onChange="{{p.setName}}" aria-label="{{p.aria}}" style="height: 36px; box-sizing: border-box; padding: 0 10px; background: #0B0D10; border: 1px solid #23272F; border-radius: 4px; font-size: 13px; color: #E6E8EB">
+            </label>
+          </sc-for>
+        </div>
+      </sc-for>
+    </div>
+  </section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":1180}}'>
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    const raw = [
+      [1,38,'A',2,7],[1,71,'B',2,9],[1,102,'A',3,11],[1,140,'B',2,null],[1,188,'B',3,3],[1,231,'A',2,23],
+      [2,15,'A',1,4],[2,50,'B',2,21],[2,94,'A',2,7],[2,133,'B',2,12],[2,170,'A',3,7],[2,214,'B',1,3],
+      [3,22,'B',3,3],[3,61,'A',2,null],[3,99,'B',2,9],[3,148,'A',1,15],[3,190,'B',3,21],[3,245,'A',2,11],
+      [4,30,'A',3,7],[4,77,'B',2,null],[4,118,'B',2,3],[4,160,'A',1,null]
+    ];
+    this.state = {
+      teamA: 'Pivôs do Churrasco', teamB: 'Inimigos da Cesta',
+      videoId: 4, time: 182, playerNum: '', lastId: 21, nextId: 22,
+      baskets: raw.map(([video, t, team, pts, num], id) => ({ id, video, t, team, pts, num })),
+      names: { 'A7': 'João', 'A11': 'Rafa', 'A23': 'Dudu', 'A15': 'Beto', 'B3': 'Marcos', 'B9': 'Léo', 'B21': 'Caio' }
+    };
+  }
+  renderVals() {
+    const s = this.state;
+    const COL = { A: '#5EA2FF', B: '#FF6B5E' };
+    const LEN = 300;
+    const clock = (x) => Math.floor(x / 60) + ':' + String(x % 60).padStart(2, '0');
+    const seek = (t) => this.setState({ time: Math.max(0, Math.min(LEN, t)) });
+    const goVideo = (v) => this.setState({ videoId: Math.max(1, Math.min(10, v)), time: 0, lastId: null });
+    const add = (team, pts) => {
+      const n = parseInt(s.playerNum, 10);
+      const b = { id: s.nextId, video: s.videoId, t: s.time, team, pts, num: isNaN(n) ? null : n };
+      this.setState({ baskets: [...s.baskets, b], nextId: s.nextId + 1, lastId: b.id, playerNum: '', time: Math.min(LEN, s.time + 21) });
+    };
+    const videos = Array.from({ length: 10 }, (_, i) => {
+      const c = s.baskets.filter((b) => b.video === i + 1).length;
+      return { id: i + 1, label: 'Video ' + String(i + 1).padStart(2, '0') + ' — ' + c + (c === 1 ? ' basket' : ' baskets') };
+    });
+    let ea = 0, eb = 0;
+    s.baskets.filter((b) => b.video < s.videoId).forEach((b) => { if (b.team === 'A') ea += b.pts; else eb += b.pts; });
+    const inVideo = s.baskets.filter((b) => b.video === s.videoId).sort((x, y) => x.t - y.t);
+    const list = inVideo.map((b) => ({
+      clock: clock(b.t), pts: b.pts, color: COL[b.team],
+      team: b.team === 'A' ? s.teamA : s.teamB,
+      num: b.num == null ? '—' : '#' + b.num, numColor: b.num == null ? '#6B717B' : '#E6E8EB',
+      bg: b.id === s.lastId ? '#1A2130' : 'transparent',
+      seek: () => seek(b.t), seekAria: 'Jump to ' + clock(b.t),
+      del: () => this.setState({ baskets: s.baskets.filter((x) => x.id !== b.id) }),
+      delAria: 'Delete basket at ' + clock(b.t)
+    }));
+    const mk = (team, keys) => [1, 2, 3].map((pts, i) => ({ pts, key: keys[i], add: () => add(team, pts),
+      aria: (team === 'A' ? s.teamA : s.teamB) + ' plus ' + pts + ' (key ' + keys[i] + ')' }));
+    const roster = (team) => {
+      const nums = new Set();
+      s.baskets.forEach((b) => { if (b.team === team && b.num != null) nums.add(b.num); });
+      Object.keys(s.names).forEach((k) => { if (k[0] === team) nums.add(parseInt(k.slice(1), 10)); });
+      const players = [...nums].sort((x, y) => x - y).map((num) => ({
+        num, name: s.names[team + num] || '', aria: 'Name for #' + num,
+        setName: (e) => this.setState({ names: { ...s.names, [team + num]: e.target.value } })
+      }));
+      return { color: COL[team], name: team === 'A' ? s.teamA : s.teamB, players, count: players.length + ' players' };
+    };
+    return {
+      teamA: s.teamA, teamB: s.teamB, teamAUpper: s.teamA.toUpperCase(), teamBUpper: s.teamB.toUpperCase(),
+      setTeamA: (e) => this.setState({ teamA: e.target.value }), setTeamB: (e) => this.setState({ teamB: e.target.value }),
+      videos, videoId: s.videoId, fileName: 'VID_2026110' + (s.videoId < 10 ? '0' : '') + s.videoId + '.mp4',
+      pickVideo: (e) => goVideo(parseInt(e.target.value, 10)), prevVideo: () => goVideo(s.videoId - 1), nextVideo: () => goVideo(s.videoId + 1),
+      entering: ea + '–' + eb,
+      clock: clock(s.time), progress: (s.time / LEN * 100).toFixed(1) + '%',
+      ticks: inVideo.map((b) => ({ pos: (b.t / LEN * 100).toFixed(1) + '%', color: COL[b.team] })),
+      back5: () => seek(s.time - 5), back1: () => seek(s.time - 1), fwd1: () => seek(s.time + 1), fwd5: () => seek(s.time + 5),
+      playerNum: s.playerNum, setNum: (e) => this.setState({ playerNum: e.target.value.replace(/\D/g, '').slice(0, 2) }),
+      btnA: mk('A', ['1', '2', '3']), btnB: mk('B', ['8', '9', '0']),
+      list, empty: list.length === 0, count: list.length + (list.length === 1 ? ' basket' : ' baskets'),
+      rosters: [roster('A'), roster('B')]
+    };
+  }
+}
+</script>
+</body>
+</html>

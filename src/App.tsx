@@ -1,13 +1,9 @@
-function App() {
-  return (
-    <div className="p-4">
-      <h1 className="text-3xl font-bold">Final Inter BBT 2026</h1>
-      <video
-        src={`${import.meta.env.BASE_URL}videos/01 WhatsApp Video 2026-11-08 at 17.14.09.mp4`}
-        controls
-      ></video>
-    </div>
-  );
-}
+import Admin from './Admin';
+import Viewer from './Viewer';
 
-export default App;
+// Append ?viewer on localhost to preview the public view.
+const isAdmin = location.hostname === 'localhost' && !location.search.includes('viewer');
+
+export default function App() {
+  return isAdmin ? <Admin /> : <Viewer />;
+}

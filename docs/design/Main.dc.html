@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Viewer — Scoring Log</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#0B0D10}
+button{font:inherit;color:inherit;background:none;border:0;margin:0;padding:0;cursor:pointer;text-align:inherit}
+button:focus-visible{outline:2px solid #E6E8EB;outline-offset:-2px}
+.log{scrollbar-width:none}
+.log::-webkit-scrollbar{display:none}
+.row:hover{background:#13171D}
+a{color:#8A9099}a:hover{color:#E6E8EB}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; display: flex; flex-direction: column; background: #0B0D10; color: #E6E8EB; font-family: 'JetBrains Mono', ui-monospace, monospace; overflow: hidden">
+
+  <header style="display: flex; flex-direction: column; gap: 8px; padding: 14px 16px 12px; border-bottom: 1px solid #23272F">
+    <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">
+      <span>FINAL · INTER BBT 2026</span>
+      <span>FINAL SCORE</span>
+    </div>
+    <div style="display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: center; gap: 12px">
+      <div style="font-size: 12px; font-weight: 700; line-height: 1.3; color: {{teamA}}">PIVÔS DO CHURRASCO</div>
+      <div style="display: flex; align-items: baseline; gap: 6px; font-size: 28px; font-weight: 800; letter-spacing: -0.02em; font-variant-numeric: tabular-nums">
+        <span style="color: {{teamA}}">{{finalA}}</span>
+        <span style="color: #4A505A; font-size: 20px">–</span>
+        <span style="color: {{teamB}}">{{finalB}}</span>
+      </div>
+      <div style="font-size: 12px; font-weight: 700; line-height: 1.3; text-align: right; color: {{teamB}}">INIMIGOS DA CESTA</div>
+    </div>
+  </header>
+
+  <div style="position: relative; width: 390px; height: 219px; background: #000; flex-shrink: 0; display: flex; justify-content: center">
+    <sc-if value="{{vertical}}" hint-placeholder-val="{{ false }}">
+      <div style="width: 123px; height: 219px; background: #15181D"></div>
+    </sc-if>
+    <sc-if value="{{landscape}}" hint-placeholder-val="{{ true }}">
+      <div style="width: 390px; height: 219px; background: #15181D"></div>
+    </sc-if>
+    <div style="position: absolute; top: 10px; left: 10px; display: flex; gap: 6px; font-size: 10px; letter-spacing: 0.08em">
+      <span style="background: rgba(0,0,0,0.7); padding: 4px 6px; border-radius: 3px">VIDEO {{sel.video}}/10</span>
+      <span style="background: rgba(0,0,0,0.7); padding: 4px 6px; border-radius: 3px; color: #C9CDD3">−5s</span>
+    </div>
+    <button aria-label="Pause" style="position: absolute; top: 82px; left: 167px; width: 56px; height: 56px; border-radius: 28px; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; border: 1px solid rgba(255,255,255,0.25)">
+      <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><rect x="5" y="4" width="3.5" height="12" fill="#E6E8EB"></rect><rect x="11.5" y="4" width="3.5" height="12" fill="#E6E8EB"></rect></svg>
+    </button>
+    <div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 10px 8px; display: flex; flex-direction: column; gap: 6px; background: rgba(0,0,0,0.55)">
+      <div style="position: relative; height: 3px; background: #3A3F48; border-radius: 2px">
+        <div style="position: absolute; left: 0; top: 0; height: 3px; width: {{sel.progress}}; background: #E6E8EB; border-radius: 2px"></div>
+        <div style="position: absolute; top: -3px; width: 2px; height: 9px; left: {{sel.markPos}}; background: {{sel.color}}"></div>
+      </div>
+      <div style="display: flex; justify-content: space-between; font-size: 10px; color: #C9CDD3; font-variant-numeric: tabular-nums">
+        <span>{{sel.startClock}}</span>
+        <span>{{sel.len}}</span>
+      </div>
+    </div>
+  </div>
+
+  <div style="display: flex; align-items: center; gap: 10px; padding: 10px 16px; border-bottom: 1px solid #23272F; background: #101318; flex-shrink: 0">
+    <span style="font-size: 10px; letter-spacing: 0.14em; color: #8A9099">NOW</span>
+    <span style="font-size: 13px; font-weight: 700; color: {{sel.color}}">{{sel.label}}</span>
+    <span style="font-size: 13px; color: #C9CDD3; flex-grow: 1; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{sel.who}}</span>
+    <span style="font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums">{{sel.score}}</span>
+  </div>
+
+  <div style="display: grid; grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr); padding: 8px 12px; font-size: 10px; letter-spacing: 0.14em; color: #8A9099; border-bottom: 1px solid #23272F; flex-shrink: 0">
+    <span style="text-align: right; color: {{teamA}}">PIVÔS</span>
+    <span style="text-align: center">SCORE</span>
+    <span style="color: {{teamB}}">INIMIGOS</span>
+  </div>
+
+  <div class="log" style="flex-grow: 1; overflow-y: auto; padding-bottom: 24px">
+    <sc-for list="{{rows}}" as="r" hint-placeholder-count="12">
+      <sc-if value="{{r.divider}}" hint-placeholder-val="{{ false }}">
+        <div style="display: flex; align-items: center; gap: 10px; padding: 14px 16px 6px; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">
+          <span>VIDEO {{r.video}}</span>
+          <span style="flex-grow: 1; height: 1px; background: #23272F"></span>
+        </div>
+      </sc-if>
+      <sc-if value="{{r.basket}}" hint-placeholder-val="{{ true }}">
+        <button class="row" onClick="{{r.pick}}" aria-label="{{r.aria}}" aria-pressed="{{r.selected}}" style="width: 100%; min-height: 44px; display: grid; grid-template-columns: minmax(0, 1fr) 76px minmax(0, 1fr); align-items: center; padding: 0 12px; box-sizing: border-box; background: {{r.bg}}; box-shadow: {{r.ring}}">
+          <span style="display: flex; justify-content: flex-end; align-items: center; gap: 8px; min-width: 0">
+            <sc-if value="{{r.isA}}" hint-placeholder-val="{{ true }}">
+              <span style="font-size: 12px; color: #C9CDD3; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{r.who}}</span>
+              <span style="font-size: 12px; font-weight: 800; padding: 3px 6px; border-radius: 3px; color: {{r.badgeFg}}; background: {{r.badgeBg}}">+{{r.pts}}</span>
+            </sc-if>
+          </span>
+          <span style="display: flex; justify-content: center; gap: 3px; font-size: 13px; font-variant-numeric: tabular-nums">
+            <span style="color: {{r.aCol}}; font-weight: {{r.aW}}">{{r.a}}</span>
+            <span style="color: #4A505A">–</span>
+            <span style="color: {{r.bCol}}; font-weight: {{r.bW}}">{{r.b}}</span>
+          </span>
+          <span style="display: flex; justify-content: flex-start; align-items: center; gap: 8px; min-width: 0">
+            <sc-if value="{{r.isB}}" hint-placeholder-val="{{ false }}">
+              <span style="font-size: 12px; font-weight: 800; padding: 3px 6px; border-radius: 3px; color: {{r.badgeFg}}; background: {{r.badgeBg}}">+{{r.pts}}</span>
+              <span style="font-size: 12px; color: #C9CDD3; overflow: hidden; white-space: nowrap; text-overflow: ellipsis">{{r.who}}</span>
+            </sc-if>
+          </span>
+        </button>
+      </sc-if>
+    </sc-for>
+    <div style="text-align: center; padding: 20px 16px 0; font-size: 10px; letter-spacing: 0.14em; color: #8A9099">END OF GAME</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"teamAColor":{"editor":"color","default":"#5EA2FF","options":["#5EA2FF","#3DD6C4","#B794FF"],"section":"Teams"},"teamBColor":{"editor":"color","default":"#FF6B5E","options":["#FF6B5E","#FFA94D","#F472B6"],"section":"Teams"},"videoOrientation":{"editor":"enum","options":["landscape","vertical"],"default":"landscape","section":"Player"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  constructor(props) { super(props); this.state = { picked: 18 }; }
+  renderVals() {
+    const A = this.props.teamAColor ?? '#5EA2FF';
+    const B = this.props.teamBColor ?? '#FF6B5E';
+    const orient = this.props.videoOrientation ?? 'landscape';
+    const names = { A: { 7: 'João', 11: 'Rafa', 23: 'Dudu', 15: 'Beto' }, B: { 3: 'Marcos', 9: 'Léo', 21: 'Caio' } };
+    const data = [
+      [1,38,'A',2,7],[1,71,'B',2,9],[1,102,'A',3,11],[1,140,'B',2,null],[1,188,'B',3,3],[1,231,'A',2,23],
+      [2,15,'A',1,4],[2,50,'B',2,21],[2,94,'A',2,7],[2,133,'B',2,12],[2,170,'A',3,7],[2,214,'B',1,3],
+      [3,22,'B',3,3],[3,61,'A',2,null],[3,99,'B',2,9],[3,148,'A',1,15],[3,190,'B',3,21],[3,245,'A',2,11],
+      [4,30,'A',3,7],[4,77,'B',2,null],[4,118,'B',2,3],[4,160,'A',1,null]
+    ];
+    const clock = (s) => Math.floor(s / 60) + ':' + String(s % 60).padStart(2, '0');
+    let a = 0, b = 0, lastVideo = 0;
+    const rows = []; let sel = null;
+    data.forEach(([v, t, team, pts, num], i) => {
+      if (v !== lastVideo) { rows.push({ divider: true, basket: false, video: v }); lastVideo = v; }
+      if (team === 'A') a += pts; else b += pts;
+      const col = team === 'A' ? A : B;
+      const nm = num != null ? names[team][num] : null;
+      const who = num == null ? '' : ('#' + num + (nm ? ' ' + nm : ''));
+      const selected = this.state.picked === i;
+      const row = {
+        divider: false, basket: true, video: v, pts, who, a, b, selected,
+        isA: team === 'A', isB: team === 'B',
+        aria: (team === 'A' ? 'Pivôs' : 'Inimigos') + ' plus ' + pts + (who ? ', ' + who : '') + ', score ' + a + ' to ' + b + '. Play.',
+        bg: selected ? '#161B22' : 'transparent',
+        ring: selected ? 'inset 0 0 0 1px ' + col : 'none',
+        badgeFg: selected ? '#0B0D10' : col,
+        badgeBg: selected ? col : col + '24',
+        aCol: team === 'A' ? A : '#8A9099', bCol: team === 'B' ? B : '#8A9099',
+        aW: team === 'A' ? 800 : 400, bW: team === 'B' ? 800 : 400,
+        pick: () => this.setState({ picked: i })
+      };
+      rows.push(row);
+      if (selected) {
+        const start = Math.max(0, t - 5), len = 300;
+        sel = { video: v, color: col, label: (team === 'A' ? 'PIVÔS' : 'INIMIGOS') + ' +' + pts, who: who || 'Unknown player', score: a + '–' + b,
+          startClock: clock(start), len: clock(len), progress: (start / len * 100).toFixed(1) + '%', markPos: (t / len * 100).toFixed(1) + '%' };
+      }
+    });
+    return { rows, sel, finalA: a, finalB: b, teamA: A, teamB: B, vertical: orient === 'vertical', landscape: orient !== 'vertical' };
+  }
+}
+</script>
+</body>
+</html>

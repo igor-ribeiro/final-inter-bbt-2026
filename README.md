@@ -1,30 +1,32 @@
-# React + TypeScript + Vite
+# Final Inter BBT 2026
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Every Basket of the final, marked in the game Videos. Viewers get a Scoring Log: click a Basket to watch it.
 
-Currently, two official plugins are available:
+Terms (Game, Video, Team, Player, Basket, Scoring Log) are defined in [GLOSSARY.md](./GLOSSARY.md).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Marking Baskets (admin)
 
-## Expanding the ESLint configuration
+1. `pnpm install`, then `pnpm dev`
+2. Open http://localhost:5173. Localhost always shows the admin view.
+3. Pick a Video and play it to the moment the Basket is made.
+4. Optionally type the Player's number, then click a button like `Home +2`.
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+Every change saves straight to `src/game.json`. Typing a new number creates that Player; give Players names in the Players section. Rename Teams at the top. To fix a mistake, delete the Basket and mark it again.
 
-- Configure the top-level `parserOptions` property like this:
+Preview the public view locally at http://localhost:5173/?viewer.
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json', './tsconfig.app.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+## Publishing
+
+Commit `src/game.json` and push to `main`. GitHub Actions builds the site and deploys it to GitHub Pages.
+
+## Adding Videos
+
+Drop `.mp4` files into `public/videos/`. Videos play in filename order (`01 …`, `02 …`), and the score carries over from one to the next. GitHub rejects files over 100 MB.
+
+## Check
+
+```
+node --experimental-strip-types src/game.check.ts
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+Checks the running score and Player creation.
