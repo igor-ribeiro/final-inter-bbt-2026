@@ -89,7 +89,9 @@ function AdminScreen(props: {
   const [armReset, setArmReset] = useState(false);
   const videos = sortedVideos(game);
   const [videoIndex, setVideoIndex] = useState(0);
-  const [playerNum, setPlayerNum] = useState('');
+  // '' = no Player, else "A:7" (team:number).
+  const [player, setPlayer] = useState('');
+  const selTeam = player ? (player[0] as TeamId) : null;
   const [lastId, setLastId] = useState<string | null>(null);
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -108,14 +110,14 @@ function AdminScreen(props: {
     else if (!full) document.documentElement.requestFullscreen?.().catch(() => {});
   }
   const ref = useRef<HTMLVideoElement>(null);
-  const numRef = useRef<HTMLInputElement>(null);
+  const numRef = useRef<HTMLSelectElement>(null);
 
   // Latest handler in a ref so the window listener is added once.
   const onKey = useRef<(e: KeyboardEvent) => void>(() => {});
   onKey.current = (e) => {
     const el = e.target as HTMLElement;
     if (el.matches('input, select, textarea')) {
-      // Enter/Esc in Player # hands the keyboard back to the shortcuts.
+      // Enter/Esc in the Player select hands the keyboard back to the shortcuts.
       if (el === numRef.current && (e.key === 'Enter' || e.key === 'Escape')) {
         e.preventDefault();
         el.blur();
@@ -176,7 +178,8 @@ function AdminScreen(props: {
   }
 
   function mark(team: TeamId, points: Basket['points']) {
-    const n = playerNum === '' ? undefined : Number(playerNum);
+    if (selTeam && selTeam !== team) return; // Player belongs to the other Team
+    const n = selTeam ? Number(player.slice(2)) : undefined;
     const basket: Basket = {
       id: crypto.randomUUID(),
       videoId: video.id,
@@ -185,10 +188,9 @@ function AdminScreen(props: {
       points,
       ...(n === undefined ? {} : { playerNumber: n }),
     };
-    const next = n === undefined ? game : ensurePlayer(game, team, n);
-    setGame({ ...next, baskets: [...next.baskets, basket] });
+    setGame({ ...game, baskets: [...game.baskets, basket] });
     setLastId(basket.id);
-    setPlayerNum('');
+    setPlayer('');
   }
 
   function remove(id: string) {
@@ -251,7 +253,7 @@ function AdminScreen(props: {
         </header>
 
         <div className="flex flex-wrap items-start gap-6">
-          <section className="flex min-w-0 flex-[999_1_640px] flex-col gap-3.5">
+          <section className="@container flex min-w-0 flex-[999_1_640px] flex-col gap-3.5">
             <div className="flex flex-wrap items-center gap-3">
               <label htmlFor="video" className={LABEL}>
                 VIDEO
@@ -372,23 +374,39 @@ function AdminScreen(props: {
               </span>
             </div>
 
-            <div className="flex flex-wrap items-stretch gap-4 rounded-md border border-line bg-surface p-4">
+            {/* One row when the section is ≥768px wide, else three rows: A / Player / B. */}
+            <div className="grid grid-cols-1 items-end gap-4 rounded-md border border-line bg-surface p-4 @3xl:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)]">
               {/* Visual order: Team A | Player # | Team B */}
               <label className={`order-2 flex flex-col items-center gap-1.5 ${LABEL}`}>
-                PLAYER #
-                <input
+                PLAYER
+                <select
                   ref={numRef}
-                  type="text"
-                  inputMode="numeric"
-                  maxLength={2}
-                  placeholder="—"
-                  value={playerNum}
-                  onChange={(e) => setPlayerNum(e.target.value.replace(/\D/g, '').slice(0, 2))}
-                  className="h-[72px] w-[88px] rounded border border-line-strong bg-bg text-center text-[32px] font-extrabold tracking-normal text-text"
-                />
+                  value={player}
+                  onChange={(e) => {
+                    setPlayer(e.target.value);
+                    e.target.blur(); // give the keys back to the shortcuts
+                  }}
+                  className="h-12 w-full rounded border border-line-strong bg-bg px-3 text-[15px] font-bold tracking-normal @3xl:h-[72px] @3xl:w-[200px]"
+                  style={{ color: selTeam ? TEAM_COLORS[selTeam] : undefined }}
+                >
+                  <option value="">— No player —</option>
+                  {(['A', 'B'] as const).map((t) => (
+                    <optgroup key={t} label={teamName(t)}>
+                      {game.players
+                        .filter((p) => p.team === t)
+                        .sort((a, b) => a.number - b.number)
+                        .map((p) => (
+                          <option key={p.number} value={`${t}:${p.number}`}>
+                            #{p.number}
+                            {p.name ? ` ${p.name}` : ''}
+                          </option>
+                        ))}
+                    </optgroup>
+                  ))}
+                </select>
               </label>
               {(['A', 'B'] as const).map((t) => (
-                <div key={t} className={`flex flex-[1_1_260px] flex-col gap-1.5 ${t === 'A' ? 'order-1' : 'order-3'}`}>
+                <div key={t} className={`flex min-w-0 flex-col gap-1.5 ${t === 'A' ? 'order-1' : 'order-3'}`}>
                   <span className={`truncate ${LABEL} uppercase`} style={{ color: TEAM_COLORS[t] }}>
                     {teamName(t)}
                   </span>
@@ -397,8 +415,9 @@ function AdminScreen(props: {
                       <button
                         key={pts}
                         onClick={() => mark(t, pts)}
+                        disabled={selTeam !== null && selTeam !== t}
                         aria-label={`${teamName(t)} plus ${pts} (key ${KEYS[t][i]})`}
-                        className="flex h-[72px] flex-col items-center justify-center gap-1 rounded border hover:brightness-115 active:translate-y-px"
+                        className="flex h-[72px] flex-col items-center justify-center gap-1 rounded border hover:brightness-115 active:translate-y-px disabled:cursor-not-allowed disabled:opacity-25 disabled:hover:brightness-100 disabled:active:translate-y-0"
                         style={{ background: TINT[t], borderColor: TEAM_COLORS[t], color: TEAM_COLORS[t] }}
                       >
                         <span className="text-2xl font-extrabold">+{pts}</span>
@@ -412,8 +431,8 @@ function AdminScreen(props: {
               ))}
             </div>
             <p className="text-xs text-muted">
-              Marks at the current time. Player # clears after each mark. Type Player #, Enter, then
-              1/2/3 · 8/9/0. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
+              Marks at the current time. Pick a Player (optional; clears after each mark), then
+              click or press 1/2/3 · 8/9/0. Add Players below. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
             </p>
           </section>
 
@@ -471,7 +490,7 @@ function AdminScreen(props: {
           <div className="flex items-baseline gap-3">
             <h2 className="text-xs font-medium tracking-[0.14em] text-muted">PLAYERS</h2>
             <span className="text-xs text-muted">
-              Added automatically when a number is marked. Names are optional.
+              Add Players here to pick them when marking. Names are optional.
             </span>
           </div>
           <div className="grid grid-cols-[repeat(auto-fit,minmax(320px,1fr))] gap-6">
@@ -511,6 +530,46 @@ function AdminScreen(props: {
                       />
                     </label>
                   ))}
+                  <form
+                    className="grid grid-cols-[56px_minmax(0,1fr)_auto] items-center gap-2 px-4 py-2"
+                    onSubmit={(e) => {
+                      e.preventDefault();
+                      const form = e.currentTarget;
+                      const f = new FormData(form);
+                      const n = Number(f.get('number'));
+                      const name = String(f.get('name')).trim() || undefined;
+                      const g = ensurePlayer(game, t, n);
+                      setGame({
+                        ...g,
+                        // An existing number just gets the name, if one was typed.
+                        players: g.players.map((p) =>
+                          p.team === t && p.number === n ? { ...p, name: name ?? p.name } : p,
+                        ),
+                      });
+                      form.reset();
+                      (form.elements.namedItem('number') as HTMLInputElement).focus();
+                    }}
+                  >
+                    <input
+                      name="number"
+                      type="text"
+                      inputMode="numeric"
+                      required
+                      pattern="\d{1,2}"
+                      maxLength={2}
+                      placeholder="#"
+                      aria-label={`New ${teamName(t)} player number`}
+                      className="h-9 w-full rounded border border-line bg-bg text-center text-[15px] font-extrabold text-text"
+                    />
+                    <input
+                      name="name"
+                      type="text"
+                      placeholder="Name (optional)"
+                      aria-label={`New ${teamName(t)} player name`}
+                      className="h-9 rounded border border-line bg-bg px-2.5 text-[15px] text-text"
+                    />
+                    <button className="h-9 rounded border border-line-strong px-3 text-text-2 hover:bg-hover">Add</button>
+                  </form>
                 </div>
               );
             })}

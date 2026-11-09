@@ -9,9 +9,9 @@ Terms (Game, Video, Team, Player, Basket, Scoring Log) are defined in [GLOSSARY.
 1. `pnpm install`, then `pnpm dev`
 2. Open http://localhost:5173. Localhost always shows the admin; GitHub Pages never does.
 3. Pick a Video and play it to the moment the Basket is made.
-4. Optionally type the Player's number and press Enter, then press `1` `2` `3` (Team A) or `8` `9` `0` (Team B), or click a `+N` button.
+4. Optionally pick the Player, then press `1` `2` `3` (Team A) or `8` `9` `0` (Team B), or click a `+N` button.
 
-Space plays/pauses, ← → seek 1s, Shift+← → seek 5s. Typing a new number creates that Player; give Players names in the Players section. To fix a mistake, delete the Basket and mark it again.
+Space plays/pauses, ← → seek 1s, Shift+← → seek 5s. Add Players (number, optional name) in the Players section. To fix a mistake, delete the Basket and mark it again.
 
 Your work saves to the browser's localStorage. "Reset to game.json" (click twice) discards it.
 
