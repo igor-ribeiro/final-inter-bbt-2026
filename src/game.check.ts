@@ -65,6 +65,14 @@ assert.deepEqual(
 assert.deepEqual(withEnds.map((e) => e.newVideo), [true, false, false, true, false, false]);
 assert.deepEqual(scoringLog(game).map((r) => r.id), ['3', '2', '1']); // still Baskets only
 
+// Notes: in game order; at the same moment after the Basket and before the period end.
+const withNotes = gameLog({
+  ...game,
+  periodEnds: [{ id: 'q1', videoId: 'v1', timeSec: 9, kind: 'quarter' }],
+  notes: [{ id: 'n1', videoId: 'v1', timeSec: 9, text: 'timeout' }],
+});
+assert.deepEqual(withNotes.map((e) => e.id), ['3', '2', 'n1', 'q1', '1']);
+
 const g2 = ensurePlayer(ensurePlayer(game, 'A', 7), 'A', 7);
 assert.equal(g2.players.length, 1);
 assert.equal(ensurePlayer(g2, 'B', 7).players.length, 2);

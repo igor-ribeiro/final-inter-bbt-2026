@@ -17,6 +17,14 @@ export interface PeriodEnd {
   kind: 'quarter' | 'period';
 }
 
+/** Free text marked at one moment in a Video (shown in the Scoring log). */
+export interface Note {
+  id: string;
+  videoId: string;
+  timeSec: number;
+  text: string;
+}
+
 export interface Game {
   title: string;
   teams: Record<TeamId, { name: string }>;
@@ -24,6 +32,7 @@ export interface Game {
   videos: { id: string; order: number; src: string; durationSec?: number }[];
   baskets: Basket[];
   periodEnds?: PeriodEnd[]; // optional: older game.json files have none
+  notes?: Note[]; // optional, same reason
 }
 
 // The one place team colors live (tailwind.config.ts imports these too).
@@ -57,22 +66,21 @@ interface Positioned {
 }
 export type LogRow = Basket & Positioned & { type: 'basket' };
 export type EndRow = PeriodEnd & Positioned & { type: 'end'; label: string }; // "END OF Q2"
-export type LogEntry = LogRow | EndRow;
+export type NoteRow = Note & Positioned & { type: 'note' };
+export type LogEntry = LogRow | EndRow | NoteRow;
 
-/**
- * Every Basket and period end in Game order (video order, then timeSec; a Basket at the
- * same moment as an end counts before it), with the running score.
- */
+// At the same moment: Basket, then note, then period end (a buzzer-beater counts before the end).
+const RANK = { basket: 0, note: 1, end: 2 };
+
+/** Every Basket, note and period end in Game order (video order, then timeSec), with the running score. */
 export function gameLog(game: Game): LogEntry[] {
   const index = new Map(sortedVideos(game).map((v, i) => [v.id, i]));
   const idx = (x: { videoId: string }) => index.get(x.videoId) ?? Infinity;
   const items = [
     ...game.baskets.map((b) => ({ ...b, type: 'basket' as const })),
+    ...(game.notes ?? []).map((n) => ({ ...n, type: 'note' as const })),
     ...(game.periodEnds ?? []).map((e) => ({ ...e, type: 'end' as const })),
-  ].sort(
-    (a, b) =>
-      idx(a) - idx(b) || a.timeSec - b.timeSec || Number(a.type === 'end') - Number(b.type === 'end'),
-  );
+  ].sort((a, b) => idx(a) - idx(b) || a.timeSec - b.timeSec || RANK[a.type] - RANK[b.type]);
   const score = { A: 0, B: 0 };
   const count = { quarter: 0, period: 0 };
   let lastVideo = -1;
@@ -84,6 +92,7 @@ export function gameLog(game: Game): LogEntry[] {
       score[x.team] += x.points;
       return { ...x, ...pos, score: { ...score } };
     }
+    if (x.type === 'note') return { ...x, ...pos, score: { ...score } };
     const n = ++count[x.kind];
     const label = x.kind === 'quarter' ? `END OF Q${n}` : `END OF PERIOD ${n}`;
     return { ...x, ...pos, score: { ...score }, label };

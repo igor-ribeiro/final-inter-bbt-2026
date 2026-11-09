@@ -158,6 +158,508 @@
       "team": "B",
       "points": 2,
       "playerNumber": 8
+    },
+    {
+      "id": "40a1e376-d1cb-43b3-906f-93a4ba2af3c5",
+      "videoId": "01",
+      "timeSec": 293.16,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "60186a12-b8cf-4ca0-9b70-b3d4f578d392",
+      "videoId": "01",
+      "timeSec": 393.92,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 12
+    },
+    {
+      "id": "75b76ebc-b595-4b02-a369-6ccd803a0fbf",
+      "videoId": "01",
+      "timeSec": 411.45,
+      "team": "B",
+      "points": 3,
+      "playerNumber": 2
+    },
+    {
+      "id": "fe930fa6-a71b-46bd-9173-fa1c667c16c8",
+      "videoId": "01",
+      "timeSec": 533.48,
+      "team": "A",
+      "points": 3,
+      "playerNumber": 21
+    },
+    {
+      "id": "44d72ce6-c82c-4396-ab06-70eab35000e8",
+      "videoId": "01",
+      "timeSec": 572.86,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 21
+    },
+    {
+      "id": "74f44806-0596-4cf5-9015-6dbace57f012",
+      "videoId": "01",
+      "timeSec": 601.73,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 21
+    },
+    {
+      "id": "b9b3abd2-14a6-4d58-9b4f-650cb46dbd81",
+      "videoId": "02",
+      "timeSec": 112.19,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "cc93b644-2f81-4860-90e9-44d90b449793",
+      "videoId": "02",
+      "timeSec": 125,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "752ddf5c-3fb4-4fcb-bb9e-3e517587c470",
+      "videoId": "02",
+      "timeSec": 149.41,
+      "team": "A",
+      "points": 3,
+      "playerNumber": 7
+    },
+    {
+      "id": "fa05209e-0907-4b81-a16f-e9d6ac5c09be",
+      "videoId": "02",
+      "timeSec": 354.32,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "af2cbc88-87ff-476b-b14a-5ae9f2f8c2dd",
+      "videoId": "02",
+      "timeSec": 378.28,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 87
+    },
+    {
+      "id": "6d48aa53-6a4c-4442-ba7b-bef6ec60863e",
+      "videoId": "02",
+      "timeSec": 446.03,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 7
+    },
+    {
+      "id": "29fd2ba6-5558-47b6-88b2-d2236e616d1e",
+      "videoId": "02",
+      "timeSec": 522.98,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 34
+    },
+    {
+      "id": "76b4b7e2-1b6e-44b1-94d1-ad14bfe2a493",
+      "videoId": "02",
+      "timeSec": 546.33,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "ebbf37b8-481c-40a1-9af2-f0579f9b3020",
+      "videoId": "02",
+      "timeSec": 706.54,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 9
+    },
+    {
+      "id": "6cb9725c-018b-492b-9b69-7d63b29ac6c5",
+      "videoId": "02",
+      "timeSec": 860.89,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 10
+    },
+    {
+      "id": "a3e57795-ac6d-43f9-867a-02a7498c4b8e",
+      "videoId": "03",
+      "timeSec": 169.82,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 5
+    },
+    {
+      "id": "e58381ad-a4ce-403d-a880-e4cb56215b45",
+      "videoId": "03",
+      "timeSec": 218.05,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 33
+    },
+    {
+      "id": "32bdefc5-0bf5-4597-974c-df40fa033d18",
+      "videoId": "03",
+      "timeSec": 261.88,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 21
+    },
+    {
+      "id": "70c2548d-21e1-4a60-bb04-efd54bc5a5ea",
+      "videoId": "03",
+      "timeSec": 293.61,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "8b05d6e3-249e-4ada-8dbc-b4f4dab5630c",
+      "videoId": "03",
+      "timeSec": 309.82,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 21
+    },
+    {
+      "id": "3bf948db-1eb2-4b41-b37c-b43f4de4b277",
+      "videoId": "06",
+      "timeSec": 10.08,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 9
+    },
+    {
+      "id": "74232ba1-7194-47b7-ac84-243f9f7a942f",
+      "videoId": "07",
+      "timeSec": 211.66,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 92
+    },
+    {
+      "id": "973a025a-d4dd-42df-b6dd-8b15061e255e",
+      "videoId": "07",
+      "timeSec": 225.64,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 22
+    },
+    {
+      "id": "9a7d4455-745c-4344-93d2-ddcbf4d28617",
+      "videoId": "07",
+      "timeSec": 324.11,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 92
+    },
+    {
+      "id": "a71a49e9-c26c-4a27-a229-e2c9280ec026",
+      "videoId": "07",
+      "timeSec": 389.38,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "64d7a7a0-9007-4545-8328-27a5303a14a8",
+      "videoId": "07",
+      "timeSec": 461,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "c5a898a3-1b15-4fd1-88f5-f9ae23afc9c5",
+      "videoId": "07",
+      "timeSec": 598.52,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "e40ebaad-12d7-45a2-8781-8e05edee9983",
+      "videoId": "07",
+      "timeSec": 658.36,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 21
+    },
+    {
+      "id": "260099d2-598c-43e2-ac68-8554618b02ad",
+      "videoId": "07",
+      "timeSec": 773.31,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "03196020-a0a1-41f2-9645-dcff5fc8519f",
+      "videoId": "07",
+      "timeSec": 836.72,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "32da198c-c695-4712-96e3-6ed92ed3a1cf",
+      "videoId": "07",
+      "timeSec": 929.81,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 0
+    },
+    {
+      "id": "bd5dcd76-7d5c-42b0-8356-a1a8ea408b70",
+      "videoId": "07",
+      "timeSec": 966.01,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 7
+    },
+    {
+      "id": "b12acfe3-8c01-48b9-8100-22c348613d7c",
+      "videoId": "07",
+      "timeSec": 984.68,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 9
+    },
+    {
+      "id": "b22d2db4-79b8-4c3c-a045-dd73c58dce70",
+      "videoId": "07",
+      "timeSec": 1001.3,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 34
+    },
+    {
+      "id": "31156eb5-343c-4985-b6be-2f820b972e7a",
+      "videoId": "08",
+      "timeSec": 13.25,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 12
+    },
+    {
+      "id": "7cbc107e-b563-4b7f-86cc-523b9d391c93",
+      "videoId": "08",
+      "timeSec": 54.8,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 22
+    },
+    {
+      "id": "0c5bd523-e6dc-45a8-87c3-ee632b767686",
+      "videoId": "08",
+      "timeSec": 242.81,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 9
+    },
+    {
+      "id": "9d2c16e6-100b-407e-b5ba-c5be01df9406",
+      "videoId": "08",
+      "timeSec": 301.71,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 22
+    },
+    {
+      "id": "330fb9c1-ea81-4938-8307-7bf2f9a0d876",
+      "videoId": "08",
+      "timeSec": 418.46,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "a8a2dd08-e81a-4dab-aa6f-bfff3a2b0100",
+      "videoId": "09",
+      "timeSec": 94.5,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 5
+    },
+    {
+      "id": "01d057b4-047e-47d0-82b1-c47c59d470a1",
+      "videoId": "09",
+      "timeSec": 138.4,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 33
+    },
+    {
+      "id": "2ac06584-8e61-4cdd-ba79-9cfeb54fe200",
+      "videoId": "09",
+      "timeSec": 195.3,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 33
+    },
+    {
+      "id": "a101e04a-9ebb-4101-a37d-5b845ed6e649",
+      "videoId": "09",
+      "timeSec": 212.81,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 22
+    },
+    {
+      "id": "5cf4395c-108f-4889-81f5-a42471a693cc",
+      "videoId": "10",
+      "timeSec": 14.63,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "ce2f285f-56b2-44b3-bb4e-a1935fffb0e4",
+      "videoId": "10",
+      "timeSec": 26.88,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "a72610ce-6199-4844-9af2-c8e12900500b",
+      "videoId": "10",
+      "timeSec": 92.74,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 33
+    },
+    {
+      "id": "83ecfbb0-8842-4703-8ba7-b401c8b6b939",
+      "videoId": "10",
+      "timeSec": 195.89,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    },
+    {
+      "id": "4555463b-9976-4c62-8ea8-494d63055861",
+      "videoId": "10",
+      "timeSec": 229.03,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "4d9118fd-bea7-4c72-9764-f74079a7b8da",
+      "videoId": "10",
+      "timeSec": 248.75,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 21
+    },
+    {
+      "id": "2b249ff4-255f-4688-b6b3-c85447353b24",
+      "videoId": "10",
+      "timeSec": 333.27,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 21
+    },
+    {
+      "id": "7ba5b531-aa7e-4043-b559-1e346299a3c2",
+      "videoId": "10",
+      "timeSec": 380.94,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 21
+    },
+    {
+      "id": "28c7688a-14f7-4c57-b8f8-f302409bb525",
+      "videoId": "10",
+      "timeSec": 423.86,
+      "team": "A",
+      "points": 3,
+      "playerNumber": 5
+    },
+    {
+      "id": "b8ccf434-8207-4129-b825-f72502eb918b",
+      "videoId": "10",
+      "timeSec": 451.89,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "3b6090ec-2b87-456a-922b-7e2a61656cac",
+      "videoId": "10",
+      "timeSec": 460.89,
+      "team": "B",
+      "points": 1,
+      "playerNumber": 8
+    },
+    {
+      "id": "e102beca-ab6f-4283-911e-5523daf619e5",
+      "videoId": "10",
+      "timeSec": 512.81,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 34
+    },
+    {
+      "id": "33867a1c-9709-42ac-be09-dd0a3de89cee",
+      "videoId": "07",
+      "timeSec": 515.74,
+      "team": "A",
+      "points": 1,
+      "playerNumber": 22
+    }
+  ],
+  "periodEnds": [
+    {
+      "id": "25a66f21-6370-4165-a4f0-9f5679bb1d07",
+      "videoId": "03",
+      "timeSec": 356.2,
+      "kind": "period"
+    },
+    {
+      "id": "5dd25ed7-496d-4f6e-94d3-755136a9bdc0",
+      "videoId": "02",
+      "timeSec": 153.51,
+      "kind": "quarter"
+    },
+    {
+      "id": "43e13e6c-e747-4684-8517-c8f4650049f5",
+      "videoId": "07",
+      "timeSec": 1063.82,
+      "kind": "quarter"
+    },
+    {
+      "id": "53f89434-8c12-4952-b24d-35f871f86f44",
+      "videoId": "03",
+      "timeSec": 356.2,
+      "kind": "quarter"
+    },
+    {
+      "id": "a13db256-1ad7-4b4e-bc9d-3c7572c0c51c",
+      "videoId": "10",
+      "timeSec": 677.37,
+      "kind": "quarter"
+    },
+    {
+      "id": "0b570808-e4c1-4a9e-bbb4-37d79d26d2d8",
+      "videoId": "10",
+      "timeSec": 677.37,
+      "kind": "period"
+    }
+  ],
+  "notes": [
+    {
+      "id": "6301ea21-3f1b-4846-bbb8-22b54b930533",
+      "videoId": "07",
+      "timeSec": 1057.88,
+      "text": "Aqui eles pedem tempo e no próximo vídeo é nossa saída de bola, então eu imagino que acabou o quarto, mas não tem vídeo do último ataque deles"
     }
   ]
 }

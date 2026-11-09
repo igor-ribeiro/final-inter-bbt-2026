@@ -11,6 +11,7 @@ import {
   sortedVideos,
   type BoxRow,
   type EndRow,
+  type NoteRow,
   type Game,
   type LogRow,
   type TeamId,
@@ -44,7 +45,7 @@ function ViewerScreen({ game }: { game: Game }) {
   const entries = gameLog(game); // Baskets + period ends, for the Scoring log
   const log = scoringLog(game); // Baskets only: selection, Prev/Next, box score
   const final = log.at(-1)?.score;
-  const [selected, setSelected] = useState<LogRow | null>(null);
+  const [selected, setSelected] = useState<LogRow | NoteRow | null>(null); // Basket or note
   const [tab, setTab] = useState<Tab>(loadTab);
   const videoRef = useRef<HTMLVideoElement>(null);
   const loadedId = useRef<string | null>(null);
@@ -60,7 +61,7 @@ function ViewerScreen({ game }: { game: Game }) {
     }
   }, [videos]);
 
-  function play(row: LogRow) {
+  function play(row: LogRow | NoteRow) {
     const v = videoRef.current!;
     const video = videos[row.videoIndex];
     const start = Math.max(0, row.timeSec - LEAD_IN_SEC);
@@ -74,10 +75,20 @@ function ViewerScreen({ game }: { game: Game }) {
     v.play().catch(() => {});
   }
 
-  // Prev/Next walk the whole log, across Videos. Next with nothing selected starts at Basket 1.
-  const selIndex = selected ? log.findIndex((r) => r.id === selected.id) : -1;
+  // Prev/Next walk the Baskets, across Videos, from wherever the selection sits in the log
+  // (a selected note counts as its position). Next with nothing selected starts at Basket 1.
+  const selIndex = selected?.type === 'basket' ? log.findIndex((r) => r.id === selected.id) : -1;
+  const selEntry = selected ? entries.findIndex((e) => e.id === selected.id) : -1;
+  const neighbour = (d: 1 | -1) => {
+    for (let i = selEntry + d; i >= 0 && i < entries.length; i += d) {
+      const e = entries[i];
+      if (e.type === 'basket') return e;
+    }
+  };
+  const prevRow = neighbour(-1);
+  const nextRow = neighbour(1);
   const step = (d: 1 | -1) => {
-    const row = log[selIndex + d];
+    const row = d === 1 ? nextRow : prevRow;
     if (row) play(row);
   };
 
@@ -190,11 +201,21 @@ function ViewerScreen({ game }: { game: Game }) {
             <div
               className={`${selected ? 'flex' : 'hidden desk:flex'} items-center gap-2.5 border-b border-line bg-surface px-4 py-2.5 desk:shrink-0 desk:gap-4 desk:rounded-md desk:border desk:py-3.5`}
             >
-              <button onClick={() => step(-1)} disabled={selIndex <= 0} aria-label="Previous basket" className={GHOST}>
+              <button onClick={() => step(-1)} disabled={!prevRow} aria-label="Previous basket" className={GHOST}>
                 ← Prev
               </button>
               <span className={LABEL}>NOW</span>
-              {selected ? (
+              {selected?.type === 'note' ? (
+                <>
+                  <span className="text-[15px] font-bold text-text-2 desk:text-base desk:font-extrabold">NOTE</span>
+                  <span className="grow truncate text-[15px] text-text-2" title={selected.text}>
+                    {selected.text}
+                  </span>
+                  <span className="text-[15px] font-bold tabular-nums desk:text-lg desk:font-extrabold">
+                    {selected.score.A}–{selected.score.B}
+                  </span>
+                </>
+              ) : selected ? (
                 <>
                   <span
                     className="text-[15px] font-bold uppercase desk:text-base desk:font-extrabold"
@@ -217,7 +238,7 @@ function ViewerScreen({ game }: { game: Game }) {
               )}
               <button
                 onClick={() => step(1)}
-                disabled={selIndex >= log.length - 1}
+                disabled={!nextRow}
                 aria-label="Next basket"
                 className={GHOST}
               >
@@ -245,6 +266,8 @@ function ViewerScreen({ game }: { game: Game }) {
                 {entries.map((e) =>
                   e.type === 'end' ? (
                     <EndRowView key={e.id} row={e} />
+                  ) : e.type === 'note' ? (
+                    <NoteRowView key={e.id} row={e} selected={selected?.id === e.id} onPlay={() => play(e)} />
                   ) : (
                     <LogRowView
                       key={e.id}
@@ -394,6 +417,25 @@ function EndRowView({ row }: { row: EndRow }) {
         </span>
         <span />
       </div>
+    </>
+  );
+}
+
+/** A note, centered. Tapping it plays from 5s before, like a Basket. */
+function NoteRowView({ row, selected, onPlay }: { row: NoteRow; selected: boolean; onPlay: () => void }) {
+  return (
+    <>
+      {row.newVideo && <VideoDivider index={row.videoIndex} />}
+      <button
+        id={`row-${row.id}`}
+        onClick={onPlay}
+        aria-pressed={selected}
+        aria-label={`Note: ${row.text}. Play.`}
+        className={`min-h-11 w-full px-4 py-2 text-center text-sm leading-snug text-text-2 desk:text-[13px] ${selected ? 'bg-selected shadow-[inset_0_0_0_1px_#C9CDD3]' : 'hover:bg-[#13171D]'}`}
+      >
+        <span className="mr-2 text-[11px] tracking-[0.14em] text-muted desk:text-[10px]">NOTE</span>
+        {row.text}
+      </button>
     </>
   );
 }

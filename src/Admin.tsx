@@ -9,6 +9,7 @@ import {
   sortedVideos,
   type Basket,
   type Game,
+  type Note,
   type PeriodEnd,
   type TeamId,
 } from './game';
@@ -121,6 +122,7 @@ function AdminScreen(props: {
   }
   const ref = useRef<HTMLVideoElement>(null);
   const numRef = useRef<HTMLSelectElement>(null);
+  const noteRef = useRef<HTMLInputElement>(null);
 
   // Latest handler in a ref so the window listener is added once.
   const onKey = useRef<(e: KeyboardEvent) => void>(() => {});
@@ -128,7 +130,11 @@ function AdminScreen(props: {
     const el = e.target as HTMLElement;
     if (el.matches('input, select, textarea')) {
       // Enter/Esc in the Player select hands the keyboard back to the shortcuts.
-      if (el === numRef.current && (e.key === 'Enter' || e.key === 'Escape')) {
+      // Esc in the note box does the same (Enter there submits the note).
+      if (
+        (el === numRef.current && (e.key === 'Enter' || e.key === 'Escape')) ||
+        (el === noteRef.current && e.key === 'Escape')
+      ) {
         e.preventDefault();
         el.blur();
       }
@@ -146,6 +152,7 @@ function AdminScreen(props: {
       f: toggleFull,
       q: () => markEnd('quarter'),
       p: () => markEnd('period'),
+      n: () => noteRef.current?.focus(),
       ArrowLeft: () => seekTo(ref.current!.currentTime - step),
       ArrowRight: () => seekTo(ref.current!.currentTime + step),
     };
@@ -223,11 +230,23 @@ function AdminScreen(props: {
     setLastId(end.id);
   }
 
+  function addNote(text: string) {
+    const note: Note = {
+      id: crypto.randomUUID(),
+      videoId: video.id,
+      timeSec: Math.round(ref.current!.currentTime * 100) / 100,
+      text,
+    };
+    setGame({ ...game, notes: [...(game.notes ?? []), note] });
+    setLastId(note.id);
+  }
+
   function remove(id: string) {
     setGame({
       ...game,
       baskets: game.baskets.filter((b) => b.id !== id),
       periodEnds: (game.periodEnds ?? []).filter((e) => e.id !== id),
+      notes: (game.notes ?? []).filter((n) => n.id !== id),
     });
   }
 
@@ -383,7 +402,7 @@ function AdminScreen(props: {
                     listEntries.map((e) => (
                       <div
                         key={e.id}
-                        className={`absolute w-0.5 ${e.type === 'end' ? '-top-2 h-5 bg-text' : '-top-1 h-3'}`}
+                        className={`absolute w-0.5 ${e.type === 'end' ? '-top-2 h-5 bg-text' : e.type === 'note' ? '-top-1 h-3 bg-muted' : '-top-1 h-3'}`}
                         style={{
                           left: `${(e.timeSec / len) * 100}%`,
                           background: e.type === 'basket' ? TEAM_COLORS[e.team] : undefined,
@@ -504,10 +523,34 @@ function AdminScreen(props: {
                   <span className="rounded-[3px] border border-line-strong px-[5px] py-px text-[11px] text-muted">{key}</span>
                 </button>
               ))}
+              {/* Note: N focuses, Enter adds it at the current time, Esc leaves without adding. */}
+              <form
+                className="flex min-w-[240px] flex-1 gap-2"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const input = noteRef.current!;
+                  const text = input.value.trim();
+                  if (text) addNote(text);
+                  input.value = '';
+                  input.blur(); // give the keys back to the shortcuts
+                }}
+              >
+                <input
+                  ref={noteRef}
+                  type="text"
+                  placeholder="Note at current time…"
+                  aria-label="Note text"
+                  className="h-10 min-w-0 flex-1 rounded border border-line-strong bg-surface-2 px-3 text-[15px] text-text"
+                />
+                <button className={`${GHOST} flex items-center gap-2 px-3 text-text-2`}>
+                  Add note
+                  <span className="rounded-[3px] border border-line-strong px-[5px] py-px text-[11px] text-muted">N</span>
+                </button>
+              </form>
             </div>
             <p className="text-xs text-muted">
               Marks at the current time. Pick a Player (optional; clears after each mark), then
-              click or press 1/2/3 · 8/9/0. Q / P end a quarter / period. Add Players below. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
+              click or press 1/2/3 · 8/9/0. Q / P end a quarter / period. N writes a note. Add Players below. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
             </p>
           </section>
 
@@ -528,7 +571,7 @@ function AdminScreen(props: {
             )}
             <div className="max-h-[640px] overflow-y-auto">
               {listEntries.map((b) =>
-                b.type === 'end' ? (
+                b.type !== 'basket' ? (
                   <div
                     key={b.id}
                     className={`grid min-h-11 grid-cols-[64px_minmax(0,1fr)_44px] items-center gap-2 border-b border-line-faint px-4 ${b.id === lastId ? 'bg-just-added' : 'bg-bg'}`}
@@ -540,15 +583,24 @@ function AdminScreen(props: {
                     >
                       {clock(b.timeSec)}
                     </button>
-                    <span className="flex items-baseline gap-3">
-                      <span className="text-xs font-bold tracking-[0.14em] text-text-2">{b.label}</span>
-                      <span className="font-extrabold tabular-nums">
-                        {b.score.A}–{b.score.B}
+                    {b.type === 'end' ? (
+                      <span className="flex items-baseline gap-3">
+                        <span className="text-xs font-bold tracking-[0.14em] text-text-2">{b.label}</span>
+                        <span className="font-extrabold tabular-nums">
+                          {b.score.A}–{b.score.B}
+                        </span>
                       </span>
-                    </span>
+                    ) : (
+                      <span className="flex min-w-0 items-baseline gap-3">
+                        <span className="text-xs tracking-[0.14em] text-muted">NOTE</span>
+                        <span className="truncate text-text-2" title={b.text}>
+                          {b.text}
+                        </span>
+                      </span>
+                    )}
                     <button
                       onClick={() => remove(b.id)}
-                      aria-label={`Delete ${b.label.toLowerCase()} at ${clock(b.timeSec)}`}
+                      aria-label={`Delete ${b.type === 'end' ? b.label.toLowerCase() : 'note'} at ${clock(b.timeSec)}`}
                       className="flex size-9 items-center justify-center rounded text-muted hover:bg-hover hover:text-team-b"
                     >
                       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
