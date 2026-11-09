@@ -95,6 +95,18 @@ function AdminScreen(props: {
   const [duration, setDuration] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [rate, setRate] = useState(1);
+  // Full screen: only the marking <section>, edge to edge, browser fullscreen when allowed.
+  const [full, setFull] = useState(false);
+  useEffect(() => {
+    const sync = () => !document.fullscreenElement && setFull(false); // browser Esc exits
+    document.addEventListener('fullscreenchange', sync);
+    return () => document.removeEventListener('fullscreenchange', sync);
+  }, []);
+  function toggleFull() {
+    setFull(!full);
+    if (document.fullscreenElement) document.exitFullscreen().catch(() => {});
+    else if (!full) document.documentElement.requestFullscreen?.().catch(() => {});
+  }
   const ref = useRef<HTMLVideoElement>(null);
   const numRef = useRef<HTMLInputElement>(null);
 
@@ -119,6 +131,7 @@ function AdminScreen(props: {
     const step = e.shiftKey ? 5 : 1;
     const actions: Record<string, () => void> = {
       ' ': togglePlay,
+      f: toggleFull,
       ArrowLeft: () => seekTo(ref.current!.currentTime - step),
       ArrowRight: () => seekTo(ref.current!.currentTime + step),
     };
@@ -188,8 +201,8 @@ function AdminScreen(props: {
       // Clicked buttons don't keep focus, so Space/Enter never re-fire the last mark.
       onMouseDown={(e) => (e.target as HTMLElement).closest('button') && e.preventDefault()}
     >
-      <div className="mx-auto flex max-w-[1376px] flex-col gap-6 px-8 pt-6 pb-12">
-        <header className="flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5">
+      <div className={`mx-auto flex flex-col gap-6 ${full ? 'p-4' : 'max-w-[1376px] px-8 pt-6 pb-12'}`}>
+        <header className={`flex flex-wrap items-end justify-between gap-4 border-b border-line pb-5 ${full ? 'hidden' : ''}`}>
           <div className="flex flex-col gap-1.5">
             <span className="text-xs tracking-[0.14em] text-muted">ADMIN</span>
             <h1 className="text-[22px] font-extrabold tracking-[-0.01em]">{game.title}</h1>
@@ -274,9 +287,15 @@ function AdminScreen(props: {
                   {entering?.A ?? 0}–{entering?.B ?? 0}
                 </span>
               </span>
+              <button onClick={toggleFull} className={`${GHOST} px-3 text-text-2`}>
+                {full ? 'Exit full screen' : 'Full screen'}
+              </button>
             </div>
 
-            <div className="relative aspect-video w-full overflow-hidden rounded-md border border-line bg-video">
+            {/* In full screen, cap the height so the mark buttons stay on screen (video pillarboxes). */}
+            <div
+              className={`relative aspect-video w-full overflow-hidden rounded-md border border-line bg-video ${full ? 'max-h-[calc(100dvh-330px)]' : ''}`}
+            >
               <video
                 ref={ref}
                 src={video.src}
@@ -354,7 +373,8 @@ function AdminScreen(props: {
             </div>
 
             <div className="flex flex-wrap items-stretch gap-4 rounded-md border border-line bg-surface p-4">
-              <label className={`flex flex-col gap-1.5 ${LABEL}`}>
+              {/* Visual order: Team A | Player # | Team B */}
+              <label className={`order-2 flex flex-col items-center gap-1.5 ${LABEL}`}>
                 PLAYER #
                 <input
                   ref={numRef}
@@ -368,7 +388,7 @@ function AdminScreen(props: {
                 />
               </label>
               {(['A', 'B'] as const).map((t) => (
-                <div key={t} className="flex flex-[1_1_260px] flex-col gap-1.5">
+                <div key={t} className={`flex flex-[1_1_260px] flex-col gap-1.5 ${t === 'A' ? 'order-1' : 'order-3'}`}>
                   <span className={`truncate ${LABEL} uppercase`} style={{ color: TEAM_COLORS[t] }}>
                     {teamName(t)}
                   </span>
@@ -393,11 +413,11 @@ function AdminScreen(props: {
             </div>
             <p className="text-xs text-muted">
               Marks at the current time. Player # clears after each mark. Type Player #, Enter, then
-              1/2/3 · 8/9/0. Space play/pause · ← → 1s · Shift+← → 5s
+              1/2/3 · 8/9/0. Space play/pause · ← → 1s · Shift+← → 5s · F full screen
             </p>
           </section>
 
-          <aside className="flex min-w-0 flex-[1_1_380px] flex-col rounded-md border border-line bg-surface">
+          <aside className={`flex min-w-0 flex-[1_1_380px] flex-col rounded-md border border-line bg-surface ${full ? 'hidden' : ''}`}>
             <div className="flex items-baseline justify-between border-b border-line px-4 py-3.5">
               <span className="text-xs tracking-[0.14em] text-muted">BASKETS IN VIDEO {pad2(videoIndex + 1)}</span>
               <span className="text-sm text-text-2">{plural(inVideo.length)}</span>
@@ -447,7 +467,7 @@ function AdminScreen(props: {
             </div>
           </aside>
         </div>
-        <section className="flex flex-col gap-3.5 pt-2">
+        <section className={`flex flex-col gap-3.5 pt-2 ${full ? 'hidden' : ''}`}>
           <div className="flex items-baseline gap-3">
             <h2 className="text-xs font-medium tracking-[0.14em] text-muted">PLAYERS</h2>
             <span className="text-xs text-muted">
