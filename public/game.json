@@ -8,7 +8,78 @@
       "name": "Inimigos da Cesta"
     }
   },
-  "players": [],
+  "players": [
+    {
+      "team": "A",
+      "number": 5,
+      "name": "Diego"
+    },
+    {
+      "team": "A",
+      "number": 7,
+      "name": "Thiago"
+    },
+    {
+      "team": "A",
+      "number": 12,
+      "name": "Ciel"
+    },
+    {
+      "team": "A",
+      "number": 21,
+      "name": "Igor"
+    },
+    {
+      "team": "A",
+      "number": 22,
+      "name": "Paulo"
+    },
+    {
+      "team": "A",
+      "number": 34,
+      "name": "João"
+    },
+    {
+      "team": "A",
+      "number": 87,
+      "name": "Claudião"
+    },
+    {
+      "team": "B",
+      "number": 2,
+      "name": "Walmir"
+    },
+    {
+      "team": "B",
+      "number": 92,
+      "name": "Gui"
+    },
+    {
+      "team": "B",
+      "number": 33,
+      "name": "Careta"
+    },
+    {
+      "team": "B",
+      "number": 8,
+      "name": "Pedro"
+    },
+    {
+      "team": "B",
+      "number": 0,
+      "name": "Negão"
+    },
+    {
+      "team": "B",
+      "number": 9,
+      "name": "Alisson?"
+    },
+    {
+      "team": "B",
+      "number": 10,
+      "name": "Shorts Cinza"
+    }
+  ],
   "videos": [
     {
       "id": "01",
@@ -71,5 +142,22 @@
       "durationSec": 704
     }
   ],
-  "baskets": []
+  "baskets": [
+    {
+      "id": "2387bbb2-4612-409c-9827-71a61c3bafff",
+      "videoId": "01",
+      "timeSec": 163.44,
+      "team": "A",
+      "points": 2,
+      "playerNumber": 12
+    },
+    {
+      "id": "6e494d7a-466c-44f1-a8f8-8bc3453e78e3",
+      "videoId": "01",
+      "timeSec": 102.85,
+      "team": "B",
+      "points": 2,
+      "playerNumber": 8
+    }
+  ]
 }

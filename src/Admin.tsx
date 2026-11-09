@@ -154,7 +154,12 @@ function AdminScreen(props: {
   const inVideo = game.baskets
     .filter((b) => b.videoId === video.id)
     .sort((a, b) => a.timeSec - b.timeSec);
-  const entering = scoringLog(game).filter((r) => r.videoIndex < videoIndex).at(-1)?.score;
+  const log = scoringLog(game);
+  const entering = log.filter((r) => r.videoIndex < videoIndex).at(-1)?.score;
+  // Score at the playhead: everything before this video plus this video's Baskets up to now.
+  const current = log
+    .filter((r) => r.videoIndex < videoIndex || (r.videoIndex === videoIndex && r.timeSec <= time))
+    .at(-1)?.score;
   const len = duration || video.durationSec || 0;
   const teamName = (t: TeamId) => game.teams[t].name;
 
@@ -283,6 +288,13 @@ function AdminScreen(props: {
               >
                 Next →
               </button>
+              {full && (
+                <span className="flex items-baseline gap-1.5 px-2 text-[22px] font-extrabold tabular-nums">
+                  <span className="text-team-a">{current?.A ?? 0}</span>
+                  <span className="text-base text-dash">–</span>
+                  <span className="text-team-b">{current?.B ?? 0}</span>
+                </span>
+              )}
               <span className="ml-auto text-sm text-muted">
                 Score entering this video:{' '}
                 <span className="font-bold text-text tabular-nums">
