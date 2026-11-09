@@ -29,12 +29,18 @@ function loadLocal(): Game | null {
   }
 }
 
-function exportGame(game: Game) {
-  const url = URL.createObjectURL(
-    new Blob([JSON.stringify(game, null, 2) + '\n'], { type: 'application/json' }),
-  );
+/** Dev server: writes public/game.json (see vite.config.ts). Otherwise: downloads it. */
+async function exportGame(game: Game): Promise<string> {
+  const json = JSON.stringify(game, null, 2) + '\n';
+  if (import.meta.env.DEV) {
+    const r = await fetch('/api/save-game', { method: 'POST', body: json });
+    if (!r.ok) throw new Error(await r.text());
+    return 'Written to public/game.json';
+  }
+  const url = URL.createObjectURL(new Blob([json], { type: 'application/json' }));
   Object.assign(document.createElement('a'), { href: url, download: 'game.json' }).click();
   URL.revokeObjectURL(url);
+  return 'Downloaded game.json';
 }
 
 export default function Admin() {
@@ -87,6 +93,8 @@ function AdminScreen(props: {
 }) {
   const { game, setGame } = props;
   const [armReset, setArmReset] = useState(false);
+  const [fileMsg, setFileMsg] = useState<{ ok: boolean; text: string } | null>(null);
+  useEffect(() => setFileMsg(null), [game]); // any edit makes the file stale again
   const videos = sortedVideos(game);
   const [videoIndex, setVideoIndex] = useState(0);
   // '' = no Player, else "A:7" (team:number).
@@ -241,9 +249,22 @@ function AdminScreen(props: {
                 Saved
               </span>
             )}
-            <button onClick={() => exportGame(game)} className={`${GHOST} px-3 text-text-2`}>
-              Export game.json
+            <button
+              onClick={() =>
+                exportGame(game).then(
+                  (text) => setFileMsg({ ok: true, text }),
+                  (e) => setFileMsg({ ok: false, text: `Save failed: ${e.message ?? e}` }),
+                )
+              }
+              className={`${GHOST} px-3 text-text-2`}
+            >
+              {import.meta.env.DEV ? 'Save to public/game.json' : 'Export game.json'}
             </button>
+            {fileMsg && (
+              <span className={`flex h-10 items-center text-xs ${fileMsg.ok ? 'text-ok' : 'text-team-b'}`}>
+                {fileMsg.text}
+              </span>
+            )}
             <button
               onClick={() => {
                 if (armReset) return setArmReset(false), props.onReset();

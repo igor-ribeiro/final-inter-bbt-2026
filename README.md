@@ -19,9 +19,8 @@ Preview the public view locally at http://localhost:5173/#/viewer.
 
 ## Publishing
 
-1. Click "Export game.json" in the admin.
-2. Replace `public/game.json` with the downloaded file.
-3. Commit and push to `main`. GitHub Actions builds the site and deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
+1. Click "Save to public/game.json" in the admin (under `pnpm dev` it writes the file directly).
+2. Commit and push to `main`. GitHub Actions builds the site and deploys it to GitHub Pages (Settings → Pages → Source: GitHub Actions).
 
 ## Adding Videos
 
