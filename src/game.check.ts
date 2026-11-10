@@ -62,6 +62,10 @@ assert.deepEqual(
   withEnds.map((e) => (e.type === 'end' ? `${e.label} ${e.score.A}-${e.score.B}` : e.id)),
   ['3', '2', 'END OF Q1 3-0', '1', 'END OF PERIOD 1 3-3', 'END OF Q2 3-3'],
 );
+assert.deepEqual(
+  withEnds.flatMap((e) => (e.type === 'end' ? [`${e.inKind.A}-${e.inKind.B}`] : [])),
+  ['3-0', '3-3', '0-3'], // Q2 counts from Q1's end; PERIOD 1 from the start
+);
 assert.deepEqual(withEnds.map((e) => e.newVideo), [true, false, false, true, false, false]);
 assert.deepEqual(scoringLog(game).map((r) => r.id), ['3', '2', '1']); // still Baskets only
 

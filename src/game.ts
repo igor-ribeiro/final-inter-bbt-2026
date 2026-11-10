@@ -65,7 +65,8 @@ interface Positioned {
   newVideo: boolean; // first entry of its Video
 }
 export type LogRow = Basket & Positioned & { type: 'basket' };
-export type EndRow = PeriodEnd & Positioned & { type: 'end'; label: string }; // "END OF Q2"
+// label: "END OF Q2"; inKind: points scored since the previous end of the same kind.
+export type EndRow = PeriodEnd & Positioned & { type: 'end'; label: string; inKind: Positioned['score'] };
 export type NoteRow = Note & Positioned & { type: 'note' };
 export type LogEntry = LogRow | EndRow | NoteRow;
 
@@ -83,6 +84,7 @@ export function gameLog(game: Game): LogEntry[] {
   ].sort((a, b) => idx(a) - idx(b) || a.timeSec - b.timeSec || RANK[a.type] - RANK[b.type]);
   const score = { A: 0, B: 0 };
   const count = { quarter: 0, period: 0 };
+  const prev = { quarter: { A: 0, B: 0 }, period: { A: 0, B: 0 } }; // score at the last end of each kind
   let lastVideo = -1;
   return items.map((x): LogEntry => {
     const videoIndex = idx(x);
@@ -95,7 +97,9 @@ export function gameLog(game: Game): LogEntry[] {
     if (x.type === 'note') return { ...x, ...pos, score: { ...score } };
     const n = ++count[x.kind];
     const label = x.kind === 'quarter' ? `END OF Q${n}` : `END OF PERIOD ${n}`;
-    return { ...x, ...pos, score: { ...score }, label };
+    const inKind = { A: score.A - prev[x.kind].A, B: score.B - prev[x.kind].B };
+    prev[x.kind] = { ...score };
+    return { ...x, ...pos, score: { ...score }, label, inKind };
   });
 }
 

@@ -109,7 +109,9 @@ function ViewerScreen({ game }: { game: Game }) {
 
   // Keep the selected row visible in the log (no-op when already visible or tab hidden).
   useEffect(() => {
-    if (selected) document.getElementById(`row-${selected.id}`)?.scrollIntoView({ block: 'nearest' });
+    if (selected)
+      for (const id of [`row-${selected.id}`, `sheet-${selected.id}`])
+        document.getElementById(id)?.scrollIntoView({ block: 'nearest' });
   }, [selected]);
 
   function pickTab(t: Tab) {
@@ -295,22 +297,32 @@ function ViewerScreen({ game }: { game: Game }) {
               </div>
             )}
           </div>
+
+          <div role="tabpanel" id="panel-sheet" aria-labelledby="tab-sheet" hidden={tab !== 'sheet'} className="flex min-h-0 grow flex-col">
+            {log.length === 0 ? (
+              <EmptyMessage />
+            ) : (
+              <Summary game={game} log={log} selectedId={selected?.id} onPlay={play} />
+            )}
+          </div>
         </aside>
       </div>
     </div>
   );
 }
 
-type Tab = 'log' | 'box';
+type Tab = 'log' | 'box' | 'sheet';
 const TAB_KEY = 'final-inter-bbt-2026:tab';
 const TABS: [Tab, string][] = [
   ['log', 'SCORING LOG'],
   ['box', 'BOX SCORE'],
+  ['sheet', 'SUMMARY'],
 ];
 
 function loadTab(): Tab {
   try {
-    return localStorage.getItem(TAB_KEY) === 'box' ? 'box' : 'log';
+    const t = localStorage.getItem(TAB_KEY);
+    return TABS.some(([id]) => id === t) ? (t as Tab) : 'log';
   } catch {
     return 'log';
   }
@@ -321,11 +333,12 @@ function Tabs({ tab, onPick }: { tab: Tab; onPick: (t: Tab) => void }) {
     <div
       role="tablist"
       aria-label="Game views"
-      className="grid shrink-0 grid-cols-2 border-b border-line"
+      className="grid shrink-0 grid-cols-3 border-b border-line"
       onKeyDown={(e) => {
         if (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') return;
         e.preventDefault();
-        const next: Tab = tab === 'log' ? 'box' : 'log'; // two tabs: either arrow flips
+        const i = TABS.findIndex(([id]) => id === tab) + (e.key === 'ArrowRight' ? 1 : -1);
+        const next = TABS[(i + TABS.length) % TABS.length][0];
         onPick(next);
         document.getElementById(`tab-${next}`)?.focus();
       }}
@@ -392,6 +405,54 @@ function BoxColumn(props: { game: Game; team: TeamId; rows: BoxRow[]; total: num
   );
 }
 
+// Running score sheet: each point 1..55 (more if a team got past it); the player # sits
+// on the point a Basket reached, e.g. a 3 from 0 puts the # on 3.
+function Summary(props: { game: Game; log: LogRow[]; selectedId?: string; onPlay: (r: LogRow) => void }) {
+  const { game, log } = props;
+  const reached = (t: TeamId) => new Map(log.filter((r) => r.team === t).map((r) => [r.score[t], r]));
+  const at = { A: reached('A'), B: reached('B') };
+  const final = log.at(-1)!.score;
+  const points = Array.from({ length: Math.max(55, final.A, final.B) }, (_, i) => i + 1);
+  // A Basket's # and point cells play it; empty cells stay inert.
+  const cell = (t: TeamId, n: number, cls: string, isPoint: boolean) => {
+    const r = at[t].get(n);
+    const text = isPoint ? n : r && (r.playerNumber ?? '–');
+    if (!r) return <span className={`text-center ${cls}`}>{text}</span>;
+    return (
+      <button
+        id={isPoint ? undefined : `sheet-${r.id}`}
+        aria-label={`Watch ${playerLabel(game, r)}, ${r.points} pts, score ${r.score.A}–${r.score.B}`}
+        aria-pressed={props.selectedId === r.id}
+        onClick={() => props.onPlay(r)}
+        className={`h-full text-center hover:bg-hover ${props.selectedId === r.id ? 'bg-selected' : ''} ${cls}`}
+        style={isPoint ? undefined : { color: TEAM_COLORS[t] }}
+      >
+        {text}
+      </button>
+    );
+  };
+  const point = (t: TeamId, n: number) => (at[t].has(n) ? 'font-extrabold text-text' : n <= final[t] ? 'text-muted' : 'text-dash');
+  const ROW = 'grid grid-cols-[minmax(0,1fr)_48px_48px_minmax(0,1fr)] items-center';
+  return (
+    <div className="flex min-h-0 grow flex-col">
+      <div className={`${ROW} shrink-0 border-b border-line py-2 text-[11px] font-bold tracking-[0.12em] uppercase desk:text-[10px]`}>
+        <span className="col-span-2 truncate border-r border-line px-3 text-center text-team-a">{shortName(game.teams.A.name)}</span>
+        <span className="col-span-2 truncate px-3 text-center text-team-b">{shortName(game.teams.B.name)}</span>
+      </div>
+      <div className={`min-h-0 grow overflow-y-auto pb-6 tabular-nums ${SCROLL}`}>
+        {points.map((n) => (
+          <div key={n} className={`${ROW} h-8 border-b border-line-faint text-sm desk:h-7 desk:text-[13px]`}>
+            {cell('A', n, 'font-extrabold', false)}
+            {cell('A', n, `border-l border-line-faint ${point('A', n)}`, true)}
+            {cell('B', n, `border-l border-line ${point('B', n)}`, true)}
+            {cell('B', n, 'border-l border-line-faint font-extrabold', false)}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
 function VideoDivider({ index }: { index: number }) {
   return (
     <div className={`flex items-center gap-2.5 px-4 pt-3.5 pb-1.5 ${LABEL} desk:text-[10px]`}>
@@ -415,7 +476,14 @@ function EndRowView({ row }: { row: EndRow }) {
           <span className="px-[3px] font-normal text-dash">–</span>
           {row.score.B}
         </span>
-        <span />
+        <span className="flex items-baseline gap-1.5 pl-2 text-[11px] tracking-[0.12em] text-muted tabular-nums desk:text-[10px]">
+          {row.kind === 'period' ? 'PERIOD' : 'QUARTER'}
+          <span className="text-[13px] font-extrabold tracking-normal desk:text-xs">
+            <span className="text-team-a">{row.inKind.A}</span>
+            <span className="px-[3px] font-normal text-dash">–</span>
+            <span className="text-team-b">{row.inKind.B}</span>
+          </span>
+        </span>
       </div>
     </>
   );
